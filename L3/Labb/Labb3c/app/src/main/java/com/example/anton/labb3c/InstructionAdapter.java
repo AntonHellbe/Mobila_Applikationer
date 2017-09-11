@@ -1,6 +1,7 @@
-package com.antonhellbegmail.labb3b;
+package com.example.anton.labb3c;
 
 import android.content.Context;
+import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,8 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
-
-import java.util.List;
 
 /**
  * Created by Anton on 2017-09-11.
@@ -36,9 +35,8 @@ public class InstructionAdapter extends ArrayAdapter<String> {
         if(convertView == null){
             convertView = (LinearLayout) inflater.inflate(R.layout.row_layout, parent, false);
         }
-        tvRow = (TextView) convertView.findViewById(R.id.content);
+        tvRow = (TextView) convertView.findViewById(R.id.tvRow);
         tvRow.setText(this.getItem(position));
         return convertView;
     }
-
 }
