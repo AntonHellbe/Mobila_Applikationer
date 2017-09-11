@@ -1,0 +1,5 @@
+<resources>
+    <string name="buttonText">Red</string>
+    <string name="TextViewText">Blank TextView Inside Fragment</string>
+    <string name="app_name">Labb3a</string>
+</resources>

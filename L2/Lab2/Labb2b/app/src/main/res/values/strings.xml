@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Labb2c</string>
+    <string name="content">This is content1</string>
+    <string name="content2">This is content2</string>
+    <string name="content3">This is content3</string>
+    <string name="whattodo">whatToDoNext1</string>
+    <string name="whattodo2">whatToDoNext2</string>
+    <string name="whattodo3">whatToDoNext3</string>
+</resources>
