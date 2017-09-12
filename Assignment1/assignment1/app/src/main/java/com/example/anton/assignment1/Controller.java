@@ -1,10 +1,15 @@
 package com.example.anton.assignment1;
 
 
+import android.app.Activity;
+import android.content.Intent;
+
 public class Controller {
 
     private String username = "hej";
     private String password = "hejhej";
+    private MainActivity mainActivity;
+    private UserActivity userActivity;
 
     public Controller(){
 
@@ -23,4 +28,10 @@ public class Controller {
             return false;
         }
     }
+
+    public void setUsername(String text){
+
+    }
+
+
 }

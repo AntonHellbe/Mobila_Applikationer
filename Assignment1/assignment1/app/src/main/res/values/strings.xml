@@ -4,4 +4,6 @@
     <string name="passwordField">******</string>
     <string name="signup">Sign up</string>
     <string name="login">Login</string>
+    <string name="drawer_open">Test</string>
+    <string name="drawer_close">Test</string>
 </resources>

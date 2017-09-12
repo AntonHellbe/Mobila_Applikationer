@@ -23,7 +23,7 @@ public class InputFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_viewer, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_input, container, false);
         initializeComponents(rootView);
         registerListeners();
         return rootView;
@@ -35,7 +35,7 @@ public class InputFragment extends Fragment {
 
     private void initializeComponents(View rootView) {
         listView = (ListView) rootView.findViewById(R.id.lView);
-        listView.setAdapter(new InstructionAdapter(getActivity(), content));
+        listView.setAdapter(new InstructionAdapter(rootView.getContext(), content));
     }
 
 
