@@ -6,4 +6,10 @@
     <string name="login">Login</string>
     <string name="drawer_open">Test</string>
     <string name="drawer_close">Test</string>
+    <string name="expenditure">Expenditure items</string>
+    <string name="Income">Income items</string>
+    <string name="editprofile">Edit Your Profile</string>
+    <string name="newUsername">New username</string>
+    <string name="newPassword">New Password</string>
+    <string name="Update">Update</string>
 </resources>

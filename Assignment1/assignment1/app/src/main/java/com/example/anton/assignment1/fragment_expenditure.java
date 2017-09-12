@@ -6,39 +6,37 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-
+import android.widget.ListView;
 
 /**
  * Created by Anton on 2017-09-12.
  */
 
-public class fragment_user extends Fragment {
+public class fragment_expenditure extends Fragment {
 
-    private EditText etUsername;
+    private ListView listView;
+    private String[] contents = {"Hej", "hopp", "det", "är", "jobbigt"};
     private Controller controller;
 
+    @Nullable
+    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_user, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_expenditure, container, false);
         initializeComponents(rootView);
+        registerListeners();
         return rootView;
     }
 
     private void initializeComponents(View rootView) {
-        etUsername = (EditText) rootView.findViewById(R.id.etUsername);
-    }
+        listView = (ListView) rootView.findViewById(R.id.lvOutcome);
+        listView.setAdapter(new FinanceAdapter(getActivity(), contents));
 
-    //public void setTvUsername(String username) {
-    //    this.etUsername.setText(username);
-    //}
+    }
 
     public void setController(Controller controller){
         this.controller = controller;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        controller.updateUsername();
+    private void registerListeners() {
     }
 }

@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         this.etPassword = (EditText) findViewById(R.id.etPassword);
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnSignup = (Button) findViewById(R.id.btnSignUp);
-        controller = new Controller(UserActivity);
+        controller = new Controller();
         registerListeners();
 
     }

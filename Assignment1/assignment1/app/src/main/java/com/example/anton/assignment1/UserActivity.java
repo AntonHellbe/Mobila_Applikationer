@@ -22,8 +22,8 @@ import java.util.List;
 
 public class UserActivity extends AppCompatActivity {
 
-    private String[] titles = {"", "Income", "Outcome"};
-    private Integer[] imgId = {R.drawable.icon0, R.drawable.icon1, R.drawable.icon2};
+    private String[] titles = {"Home","","Income", "Expenditure"};
+    private Integer[] imgId = {R.drawable.icon0, R.drawable.icon1, R.drawable.icon2, R.drawable.icon3};
     private DrawerLayout drawerLayout;
     private ListView listView;
     private ActionBarDrawerToggle drawerToggle;
@@ -35,7 +35,8 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
         initializeComponenets();
-        cont = new Controller();
+        registerListeners();
+        cont = new Controller(this);
 
     }
 
@@ -45,19 +46,21 @@ public class UserActivity extends AppCompatActivity {
         tvUsername = (TextView) findViewById(R.id.tvContent);
 
         Intent intent = getIntent();
-        titles[0] = intent.getStringExtra("userid");
-
-        tvUsername.setText("Welcome " + titles[0]);
+        titles[1] = intent.getStringExtra("userid");
 
         listView.setAdapter(new MenuAdapter(this, titles, imgId));
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
     }
 
+    private void registerListeners() {
+        listView.setOnItemClickListener(new ListViewListener());
+    }
+
     private class ListViewListener implements AdapterView.OnItemClickListener{
 
         @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            cont.changeFragment(position);
         }
     }
 
@@ -71,6 +74,8 @@ public class UserActivity extends AppCompatActivity {
         }
         ft.commit();
     }
+
+
 
 
 }
