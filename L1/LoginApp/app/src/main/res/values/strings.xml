@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">LoginApp</string>
     <string name="email">example@provider.com</string>
     <string name="password">********</string>
 </resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Assignment1</string>
+    <string name="editUser">ex: John Doe</string>
+    <string name="passwordField">******</string>
+    <string name="signup">Sign up</string>
+    <string name="login">Login</string>
+</resources>
