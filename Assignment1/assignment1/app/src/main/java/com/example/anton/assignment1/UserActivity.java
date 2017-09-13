@@ -22,8 +22,8 @@ import java.util.List;
 
 public class UserActivity extends AppCompatActivity {
 
-    private String[] titles = {"Home","","Income", "Expenditure"};
-    private Integer[] imgId = {R.drawable.icon0, R.drawable.icon1, R.drawable.icon2, R.drawable.icon3};
+    private String[] titles = {"Home","","Income", "Expenditure", "Set dates"};
+    private Integer[] imgId = {R.drawable.account_circle, R.drawable.account_edit, R.drawable.chart_bar, R.drawable.chart_bar, R.drawable.calendar_range};
     private DrawerLayout drawerLayout;
     private ListView listView;
     private ActionBarDrawerToggle drawerToggle;

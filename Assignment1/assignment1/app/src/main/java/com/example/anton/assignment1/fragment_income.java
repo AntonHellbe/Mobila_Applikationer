@@ -3,10 +3,13 @@ package com.example.anton.assignment1;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+
+import java.util.ArrayList;
 
 
 /**
@@ -15,29 +18,40 @@ import android.widget.ListView;
 
 public class fragment_income extends Fragment {
 
-    private ListView listView;
-    private String[] contents = {"hello", "my", "name", "is", "slim shady"};
+    private RecyclerView recyclerView;
+    private ArrayList<Transaction> income = new ArrayList<>();
     private Controller controller;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView.Adapter transactionAdapter;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        controller.setTransactionAdapter();
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_income, container, false);
         initializeComponents(rootView);
-        registerListeners();
         return rootView;
     }
 
     private void initializeComponents(View rootView) {
-        listView = (ListView) rootView.findViewById(R.id.lvIncome);
-        listView.setAdapter(new FinanceAdapter(getActivity(), contents));
-
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.rv);
+        recyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(mLayoutManager);
     }
     
     public void setController(Controller controller){
         this.controller = controller;
     }
 
-    private void registerListeners() {
+    public void setAdapter(ArrayList<Transaction> transactionArrayList){
+        transactionAdapter = new TransactionAdapter(transactionArrayList);
+        recyclerView.setAdapter(transactionAdapter);
     }
+
 }

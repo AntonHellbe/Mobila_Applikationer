@@ -6,38 +6,11 @@
     android:layout_height="match_parent"
     android:weightSum="1">
 
-    <TextView
-        android:id="@+id/tvOutcome"
+    <android.support.v7.widget.RecyclerView
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/expenditure"
-        android:textSize="20sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textStyle="bold"
+        android:id="@+id/rv"
         />
-
-    <ListView
-        android:id="@+id/lvOutcome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="#696969"
-        android:dividerHeight="1dp"
-
-        android:layout_below="@+id/tvOutcome"
-        android:layout_alignParentStart="true">
-    </ListView>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:clickable="true"
-        app:backgroundTint="@color/colorPrimary"
-        app:fabSize="mini"
-        app:srcCompat="@android:drawable/ic_menu_search" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -45,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="12dp"
-        android:layout_toStartOf="@+id/floatingActionButton4"
+        android:gravity="bottom|right"
         android:clickable="true"
         app:backgroundTint="@color/colorPrimary"
         app:fabSize="mini"

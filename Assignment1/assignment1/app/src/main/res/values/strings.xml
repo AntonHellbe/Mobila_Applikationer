@@ -12,4 +12,13 @@
     <string name="newUsername">New username</string>
     <string name="newPassword">New Password</string>
     <string name="Update">Update</string>
+    <string-array name="spinnerChoice">
+        <item>Year</item>
+        <item>Month</item>
+        <item>Week</item>
+        <item>Other</item>
+    </string-array>
+    <string name="dateSelection">Select dates</string>
+    <string name="toggleBtnOff">Show Income Graph</string>
+    <string name="toggleBtnOn">Show Expenditure Graph</string>
 </resources>
