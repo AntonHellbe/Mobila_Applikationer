@@ -2,14 +2,18 @@ package com.example.anton.assignment1;
 
 
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.github.mikephil.charting.data.PieData;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -32,6 +36,7 @@ public class Controller {
     private String[] toggleStates = new String[2];
     private int spinnerCategory;
     private int spinnerCategory1;
+    private TransactionDBHelper transactionDBHelper;
 
 
     public Controller(){
@@ -39,7 +44,6 @@ public class Controller {
     }
 
     public Controller(UserActivity userActivity){
-
         this.userActivity = userActivity;
         this.fragmentMain = new FragmentMain();
         this.fragmentIncome = new FragmentIncome();
@@ -47,6 +51,7 @@ public class Controller {
         this.fragmentUser = new FragmentUser();
         this.fragmentSearch = new FragmentSearch();
         this.fragmentAdd = new FragmentAdd();
+        this.transactionDBHelper = new TransactionDBHelper(userActivity);
 
         this.pieChartHandler = new PieChartHandler();
         this.db = new DatabaseIF();
@@ -119,13 +124,13 @@ public class Controller {
         if(!state){
             switch(dateSelected){
                 case 0:
-                    pieData = pieChartHandler.mapExpenditure(db.getExpendituresYear());
+                    pieData = pieChartHandler.mapExpenditure(getExpenditureRange("Year"));
                     break;
                 case 1:
-                    pieData = pieChartHandler.mapExpenditure(db.getExpendituresMonth());
+                    pieData = pieChartHandler.mapExpenditure(getExpenditureRange("Month"));
                     break;
                 case 2:
-                    pieData = pieChartHandler.mapExpenditure(db.getExpendituresWeek());
+                    pieData = pieChartHandler.mapExpenditure(getExpenditureRange("Week"));
                     break;
             }
 
@@ -133,13 +138,13 @@ public class Controller {
         }else{
             switch(dateSelected){
                 case 0:
-                    pieData = pieChartHandler.mapIncome(db.getIncomeYear());
+                    pieData = pieChartHandler.mapIncome(getIncomeRange("Year"));
                     break;
                 case 1:
-                    pieData = pieChartHandler.mapIncome(db.getIncomeMonth());
+                    pieData = pieChartHandler.mapIncome(getIncomeRange("Month"));
                     break;
                 case 2:
-                    pieData = pieChartHandler.mapIncome(db.getIncomeWeek());
+                    pieData = pieChartHandler.mapIncome(getIncomeRange("Week"));
                     break;
             }
             fragmentMain.setTbOff(toggleStates[0]);
@@ -161,23 +166,23 @@ public class Controller {
             case 0:
                 // TODO - set Search to Year / Month / Week
                 if(currentFragment == 3){
-                    fragmentExpenditure.setAdapter(db.getExpendituresYear());
+                    fragmentExpenditure.setAdapter(getExpenditureRange("Year"));
                 }else{
-                    fragmentIncome.setAdapter(db.getIncomeYear());
+                    fragmentIncome.setAdapter(getIncomeRange("Year"));
                 }
                 break;
             case 1:
                 if(currentFragment == 3){
-                    fragmentExpenditure.setAdapter(db.getExpendituresMonth());
+                    fragmentExpenditure.setAdapter(getExpenditureRange("Month"));
                 }else{
-                    fragmentIncome.setAdapter(db.getIncomeMonth());
+                    fragmentIncome.setAdapter(getIncomeRange("Month"));
                 }
                 break;
             case 2:
                 if(currentFragment == 3){
-                    fragmentExpenditure.setAdapter(db.getExpendituresWeek());
+                    fragmentExpenditure.setAdapter(getExpenditureRange("Week"));
                 }else{
-                    fragmentIncome.setAdapter(db.getIncomeWeek());
+                    fragmentIncome.setAdapter(getIncomeRange("Week"));
                 }
                 break;
             case 3:
@@ -288,4 +293,144 @@ public class Controller {
                 break;
         }
     }
+
+    public void testData(){
+        ArrayList<Transaction> transz = new ArrayList<>();
+        Transaction trans = new Transaction("Income", "Testing1", "JohnDoe", 50.45f, "Salary", "2017-09-07");
+        Transaction trans1 = new Transaction("Expenditure", "Testing2", "JohnDoe", 60.45f, "Food", "2017-09-05");
+        Transaction trans2 = new Transaction("Expenditure", "Testing3", "JohnDoe", 70.45f, "Leisure", "2017-05-10");
+        Transaction trans3 = new Transaction("Income", "Testing4", "JohnDoe", 77.45f, "Other", "2017-04-20");
+        Transaction trans4 = new Transaction("Expenditure", "Testing5", "JohnDoe", 23.45f, "Accomodation", "2017-03-15");
+        Transaction trans5 = new Transaction("Income", "Testing6", "JohnDoe", 25.45f, "Salary", "2017-01-01");
+        Transaction trans6 = new Transaction("Expenditure", "Testing7", "JohnDoe", 43.45f, "Travel", "2017-10-10");
+        Transaction trans7 = new Transaction("Income", "Testing8", "JohnDoe", 123.45f, "Other", "2017-03-03");
+        transz.add(trans);
+        transz.add(trans1);
+        transz.add(trans2);
+        transz.add(trans3);
+        transz.add(trans4);
+        transz.add(trans5);
+        transz.add(trans6);
+        transz.add(trans7);
+
+        addTransaction2(transz);
+    }
+
+    public void addTransaction2(ArrayList<Transaction> transaction){
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        for(int i = 0; i < transaction.size(); i++){
+            ContentValues values = new ContentValues();
+            values.put(TransactionDBHelper.COLUMN_TYPE, transaction.get(i).getType());
+            values.put(TransactionDBHelper.COLUMN_TITLE, transaction.get(i).getTitle());
+            values.put(TransactionDBHelper.COLUMN_USERID, transaction.get(i).getUserid());
+            values.put(TransactionDBHelper.COLUMN_AMOUNT, transaction.get(i).getAmount());
+            values.put(TransactionDBHelper.COLUMN_CATEGORY, transaction.get(i).getCategory());
+            values.put(TransactionDBHelper.COLUMN_DATE, transaction.get(i).getDate());
+            db.insert(TransactionDBHelper.TABLE_NAME, "", values);
+        }
+    }
+
+    public void addTransaction(Transaction transaction){
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TransactionDBHelper.COLUMN_TYPE, transaction.getType());
+        values.put(TransactionDBHelper.COLUMN_TITLE, transaction.getTitle());
+        values.put(TransactionDBHelper.COLUMN_USERID, transaction.getUserid());
+        values.put(TransactionDBHelper.COLUMN_AMOUNT, transaction.getAmount());
+        values.put(TransactionDBHelper.COLUMN_CATEGORY, transaction.getCategory());
+        values.put(TransactionDBHelper.COLUMN_DATE, transaction.getDate());
+        Log.v("Controller", "" + values);
+        db.insert(TransactionDBHelper.TABLE_NAME, "", values);
+    }
+
+    public ArrayList<Transaction> getIncomeRange(String range){
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        //transactionDBHelper.onUpgrade(db, 1, 2);
+        //testData();
+        int idIndex, titleIndex, typeIndex, useridIndex, amountIndex, categoryIndex, dateIndex;
+        String fromDate = "";
+        String toDate = "";
+        switch(range){
+            case "Year":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-365);
+                break;
+            case "Month":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-31);
+                break;
+            case "Week":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-7);
+        }
+
+
+//        transactionDBHelper.onUpgrade(db, 1, 2);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_TYPE + " = ?" + " AND " + TransactionDBHelper.COLUMN_USERID + " = ?" + " AND "
+                +   "? >= " + TransactionDBHelper.COLUMN_DATE + " AND " + "? <= " + TransactionDBHelper.COLUMN_DATE, new String[]{"Income", getCurrentUserName(), fromDate, toDate});
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
+        titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
+        typeIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TYPE);
+        useridIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_USERID);
+        amountIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_AMOUNT);
+        categoryIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_CATEGORY);
+        dateIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_DATE);
+
+        for(int i = 0; i < cursor.getCount(); i++){
+            cursor.moveToPosition(i);
+            Transaction trans = new Transaction(cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
+                    cursor.getFloat(amountIndex), cursor.getString(categoryIndex), cursor.getString(dateIndex));
+            trans.setId(cursor.getInt(idIndex));
+            transactions.add(trans);
+        }
+        return transactions;
+    }
+
+    public ArrayList<Transaction> getExpenditureRange(String range){
+
+        int idIndex, titleIndex, typeIndex, useridIndex, amountIndex, categoryIndex, dateIndex;
+        String fromDate = "";
+        String toDate = "";
+        switch(range){
+            case "Year":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-365);
+                break;
+            case "Month":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-31);
+                break;
+            case "Week":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-7);
+        }
+
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+//        transactionDBHelper.onUpgrade(db, 1, 2);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_TYPE + " = ?" + " AND " + TransactionDBHelper.COLUMN_USERID + " = ?" + " AND "
+                +   "? >= " + TransactionDBHelper.COLUMN_DATE + " AND " + "? <= " + TransactionDBHelper.COLUMN_DATE, new String[]{"Expenditure", getCurrentUserName(), fromDate, toDate});
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
+        titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
+        typeIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TYPE);
+        useridIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_USERID);
+        amountIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_AMOUNT);
+        categoryIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_CATEGORY);
+        dateIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_DATE);
+
+        for(int i = 0; i < cursor.getCount(); i++){
+            cursor.moveToPosition(i);
+            Transaction trans = new Transaction(cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
+                    cursor.getFloat(amountIndex), cursor.getString(categoryIndex), cursor.getString(dateIndex));
+            trans.setId(cursor.getInt(idIndex));
+            transactions.add(trans);
+        }
+        return transactions;
+    }
+
+    public Controller getInstance(){
+        return this;
+    }
+
 }

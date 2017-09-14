@@ -17,12 +17,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.List;
+
+import static java.lang.Float.parseFloat;
 
 /**
  * Created by Anton on 2017-09-14.
@@ -34,6 +39,9 @@ public class FragmentAdd extends Fragment{
     private RadioGroup rgType;
     private Spinner sCategory;
     private Button btnDate, btnAdd;
+    private EditText etTitle, etAmount;
+    private RadioButton rbIncome, rbExpense;
+    private String expense;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_add, container, false);
@@ -49,6 +57,10 @@ public class FragmentAdd extends Fragment{
     }
 
     private void initializeComponents(View rootView) {
+        rbExpense = (RadioButton) rootView.findViewById(R.id.rbExpend);
+        rbIncome = (RadioButton) rootView.findViewById(R.id.rbInc);
+        etTitle = (EditText) rootView.findViewById(R.id.etTitle);
+        etAmount = (EditText) rootView.findViewById(R.id.etAmount);
         rgType = (RadioGroup) rootView.findViewById(R.id.rgType);
         sCategory = (Spinner) rootView.findViewById(R.id.sCategory);
         btnDate = (Button) rootView.findViewById(R.id.btnDate);
@@ -61,8 +73,11 @@ public class FragmentAdd extends Fragment{
 
 
     private void registerListeners() {
-        rgType.setOnCheckedChangeListener(new RadioGroupListener());
-        btnDate.setOnClickListener(new ButtonListener());
+        if(controller != null) {
+            rgType.setOnCheckedChangeListener(new RadioGroupListener());
+            btnDate.setOnClickListener(new ButtonListener());
+            btnAdd.setOnClickListener(new ButtonListener());
+        }
     }
 
     public void setSpinnerAdapter(int spinnerAdapter) {
@@ -76,29 +91,16 @@ public class FragmentAdd extends Fragment{
 
         @Override
         public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-            if(controller != null) {
-                switch(i){
-                    case R.id.rbExpend:
-                        controller.changeSpinner(0);
-                        break;
-                    case R.id.rbInc:
-                        controller.changeSpinner(1);
-                        break;
-                    }
-            }
-        }
-    }
-
-    private class SpinnerListener implements AdapterView.OnItemSelectedListener{
-
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-
+            switch(i){
+                case R.id.rbExpend:
+                    controller.changeSpinner(0);
+                    expense = rbExpense.getText().toString();
+                    break;
+                case R.id.rbInc:
+                    controller.changeSpinner(1);
+                    expense = rbIncome.getText().toString();
+                    break;
+                }
         }
     }
 
@@ -112,7 +114,15 @@ public class FragmentAdd extends Fragment{
                     new DatePickerDialog(getActivity(), new DatePickerListener(), cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
                     break;
                 case R.id.btnAdd:
-
+                    try{
+                        Transaction trans = new Transaction(expense, etTitle.getText().toString(), controller.getCurrentUserName(),
+                                parseFloat(etAmount.getText().toString()), sCategory.getSelectedItem().toString(), btnDate.getText().toString());
+                        controller.addTransaction(trans);
+                        Toast.makeText(getActivity(), "Transaction added!", Toast.LENGTH_SHORT).show();
+                        trans.describe();
+                    }catch(Exception e){
+                        Toast.makeText(getActivity(), "One or more fields missing!", Toast.LENGTH_SHORT).show();
+                    }
                     break;
 
 
@@ -123,7 +133,13 @@ public class FragmentAdd extends Fragment{
     private class DatePickerListener implements DatePickerDialog.OnDateSetListener{
 
         public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
-            btnDate.setText("" + year + "-" + month + "-" + dayOfMonth);
+            if(month < 10){
+                String forMmonth = String.format("%02d", (month + 1));
+                btnDate.setText("" + year + "-" + forMmonth + "-" + dayOfMonth);
+            }else {
+                btnDate.setText("" + year + "-" + (month + 1) + "-" + dayOfMonth);
+            }
+
         }
     }
 
