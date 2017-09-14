@@ -1,10 +1,13 @@
 package com.example.anton.assignment1;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Anton on 2017-09-13.
  */
 
-public class User {
+public class User{
 
     private String username;
     private String password;

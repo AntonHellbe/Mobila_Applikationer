@@ -8,13 +8,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
-import java.util.List;
 
 /**
  * Created by Anton on 2017-09-12.
@@ -27,23 +21,32 @@ public class UserActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ListView listView;
     private ActionBarDrawerToggle drawerToggle;
-    private Controller cont;
+    private Controller controller;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
-        cont = new Controller(this);
+        controller = new Controller(this);
         initializeComponenets();
         registerListeners();
+        if(savedInstanceState != null){
+            controller.rescueMission(savedInstanceState);
+        }
 
+    }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        outState = controller.saveInformation(outState);
+        super.onSaveInstanceState(outState);
     }
 
     private void initializeComponenets() {
         Intent intent = getIntent();
-        cont.createUser(intent);
-        titles[1] = cont.getCurrentUserName();
+        controller.createUser(intent);
+        titles[1] = controller.getCurrentUserName();
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         listView = (ListView) findViewById(R.id.left_drawer);
         listView.setAdapter(new MenuAdapter(this, titles, imgId));
@@ -67,7 +70,7 @@ public class UserActivity extends AppCompatActivity {
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            cont.changeFragment(position);
+            controller.changeFragment(position);
         }
     }
 

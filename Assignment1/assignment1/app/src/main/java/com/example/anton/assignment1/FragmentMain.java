@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
  * Created by Anton on 2017-09-12.
  */
 
-public class fragment_main extends Fragment {
+public class FragmentMain extends Fragment {
 
     private Controller controller;
     private TextView tvUsername;
@@ -78,12 +79,19 @@ public class fragment_main extends Fragment {
         pieChart.animateY(1000, Easing.EasingOption.EaseInOutQuad); // Cool animation after refreshing the data
     }
 
+
+
     private class ToggleButtonListener implements CompoundButton.OnCheckedChangeListener{
 
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-            controller.addChartData(isChecked);
-            state = isChecked;
+            if (controller != null) {
+                if(state == isChecked){
+                    isChecked = !isChecked;
+                }
+                controller.addChartData(isChecked);
+                state = isChecked;
+            }
         }
     }
 
@@ -93,6 +101,14 @@ public class fragment_main extends Fragment {
 
     public void setTbOn(String text){
         tbBtn.setTextOn(text);
+    }
+
+    public Boolean getState(){
+        return state;
+    }
+
+    public void setState(Boolean state){
+        this.state = state;
     }
 
 }

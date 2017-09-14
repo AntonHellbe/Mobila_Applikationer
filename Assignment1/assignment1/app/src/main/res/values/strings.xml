@@ -22,4 +22,23 @@
     <string name="toggleBtnOff">Show Income Graph</string>
     <string name="toggleBtnOn">Show Expenditure Graph</string>
     <string name="dateFields">YYYY-MM-DD</string>
+
+    <string name="rbExpenditure">Expenditure</string>
+    <string name="rbIncome">Income</string>
+    <string name="tvCategory">Categories</string>
+    <string name="tvAmount">Amount</string>
+    <string name="btnAdd">Add</string>
+
+    <string-array name="spinnerCategory">
+        <item>Travel</item>
+        <item>Leisure</item>
+        <item>Food</item>
+        <item>Other</item>
+        <item>Accommodation</item>
+    </string-array>
+
+    <string-array name="spinnerCategory1">
+        <item>Salary</item>
+        <item>Other</item>
+    </string-array>
 </resources>

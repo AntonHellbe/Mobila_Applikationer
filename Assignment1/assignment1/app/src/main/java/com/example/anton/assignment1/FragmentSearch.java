@@ -24,7 +24,7 @@ import java.util.Calendar;
  * Created by Anton on 2017-09-13.
  */
 
-public class fragment_search extends Fragment {
+public class FragmentSearch extends Fragment {
 
     private Spinner spinner;
     private Controller controller;

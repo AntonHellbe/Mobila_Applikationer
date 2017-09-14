@@ -15,7 +15,7 @@ import android.widget.Toast;
  * Created by Anton on 2017-09-12.
  */
 
-public class fragment_user extends Fragment {
+public class FragmentUser extends Fragment {
 
     private EditText etUsername, etPassword;
     private Button editBtn;

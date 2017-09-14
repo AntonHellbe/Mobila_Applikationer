@@ -1,13 +1,15 @@
 package com.example.anton.assignment1;
 
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Bundle;
+import android.util.Log;
 
 import com.github.mikephil.charting.data.PieData;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,17 +18,20 @@ public class Controller {
     private String username = "hej";
     private String password = "hejhej";
     private UserActivity userActivity;
-    private fragment_income fragmentIncome;
+    private FragmentIncome fragmentIncome;
     private fragment_expenditure fragmentExpenditure;
-    private fragment_user fragmentUser;
-    private fragment_main fragmentMain;
-    private fragment_search fragmentSearch;
+    private FragmentUser fragmentUser;
+    private FragmentMain fragmentMain;
+    private FragmentSearch fragmentSearch;
+    private FragmentAdd fragmentAdd;
     private PieChartHandler pieChartHandler;
     private int currentFragment = 0;
     private int dateSelected;
     private DatabaseIF db;
     private User currentUser;
     private String[] toggleStates = new String[2];
+    private int spinnerCategory;
+    private int spinnerCategory1;
 
 
     public Controller(){
@@ -36,18 +41,21 @@ public class Controller {
     public Controller(UserActivity userActivity){
 
         this.userActivity = userActivity;
-        this.fragmentIncome = new fragment_income();
+        this.fragmentMain = new FragmentMain();
+        this.fragmentIncome = new FragmentIncome();
         this.fragmentExpenditure = new fragment_expenditure();
-        this.fragmentUser = new fragment_user();
-        this.fragmentMain = new fragment_main();
-        this.fragmentSearch = new fragment_search();
+        this.fragmentUser = new FragmentUser();
+        this.fragmentSearch = new FragmentSearch();
+        this.fragmentAdd = new FragmentAdd();
+
         this.pieChartHandler = new PieChartHandler();
         this.db = new DatabaseIF();
 
+        fragmentAdd.setController(this);
+        fragmentMain.setController(this);
         fragmentIncome.setController(this);
         fragmentExpenditure.setController(this);
         fragmentUser.setController(this);
-        fragmentMain.setController(this);
         fragmentSearch.setController(this);
         initializeResources();
         userActivity.setFragment(fragmentMain, true);
@@ -57,6 +65,8 @@ public class Controller {
         Resources res = userActivity.getResources();
         toggleStates[0] = res.getString(R.string.toggleBtnOff);
         toggleStates[1] = res.getString(R.string.toggleBtnOn);
+        spinnerCategory = R.array.spinnerCategory;
+        spinnerCategory1 = R.array.spinnerCategory1;
 
     }
 
@@ -97,6 +107,8 @@ public class Controller {
                 case 4:
                     userActivity.setFragment(fragmentSearch, true);
                     break;
+                case 5:
+                    userActivity.setFragment(fragmentAdd, true);
             }
         }
         currentFragment = position;
@@ -135,6 +147,11 @@ public class Controller {
         pieData.setValueTextSize(10f);
         fragmentMain.setPieChartData(pieData);
 
+    }
+
+    public void setAddFragment(){
+        userActivity.setFragment(fragmentAdd, true);
+        currentFragment = 5;
     }
 
 
@@ -245,5 +262,30 @@ public class Controller {
 
     public String getCurrentUserName(){
         return currentUser.getUsername();
+    }
+
+
+    public Bundle saveInformation(Bundle outState) {
+        outState.putInt("currentFragment", currentFragment);
+        outState.putBoolean("piechart", fragmentMain.getState());
+
+        return outState;
+    }
+
+    public void rescueMission(Bundle savedInstanceState) {
+        fragmentMain.setState(savedInstanceState.getBoolean("piechart"));
+        changeFragment(savedInstanceState.getInt("currentFragment"));
+
+    }
+
+    public void changeSpinner(int i) {
+        switch(i){
+            case 0:
+                fragmentAdd.setSpinnerAdapter(spinnerCategory);
+                break;
+            case 1:
+                fragmentAdd.setSpinnerAdapter(spinnerCategory1);
+                break;
+        }
     }
 }
