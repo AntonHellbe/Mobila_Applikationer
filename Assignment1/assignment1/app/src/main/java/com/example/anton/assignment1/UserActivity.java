@@ -27,30 +27,37 @@ public class UserActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ListView listView;
     private ActionBarDrawerToggle drawerToggle;
-    private TextView tvUsername;
     private Controller cont;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
+        cont = new Controller(this);
         initializeComponenets();
         registerListeners();
-        cont = new Controller(this);
+
 
     }
 
     private void initializeComponenets() {
+        Intent intent = getIntent();
+        cont.createUser(intent);
+        titles[1] = cont.getCurrentUserName();
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         listView = (ListView) findViewById(R.id.left_drawer);
-        tvUsername = (TextView) findViewById(R.id.tvContent);
-
-        Intent intent = getIntent();
-        titles[1] = intent.getStringExtra("userid");
-
         listView.setAdapter(new MenuAdapter(this, titles, imgId));
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+
+
     }
+
+    public void updateNavDrawer(String username){
+        titles[1] = username;
+        listView.setAdapter(new MenuAdapter(this, titles, imgId));
+
+    }
+
 
     private void registerListeners() {
         listView.setOnItemClickListener(new ListViewListener());

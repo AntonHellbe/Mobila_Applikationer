@@ -30,7 +30,7 @@ public class fragment_main extends Fragment {
     private TextView tvUsername;
     private PieChart pieChart;
     private ToggleButton tbBtn;
-    private Boolean currentState = false;
+    private Boolean state = false;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
@@ -50,6 +50,8 @@ public class fragment_main extends Fragment {
         pieChart.setHoleRadius(40f);
         pieChart.setTransparentCircleAlpha(0);
         pieChart.getDescription().setText("");
+        pieChart.setEntryLabelColor(Color.BLACK);
+        pieChart.setEntryLabelTextSize(10f);
         //pieChart.setDescription();
     }
 
@@ -62,7 +64,7 @@ public class fragment_main extends Fragment {
     public void onResume() {
         super.onResume();
         controller.updateUsername();
-        controller.addChartData(false);
+        controller.addChartData(state);
 
     }
 
@@ -72,8 +74,8 @@ public class fragment_main extends Fragment {
 
     public void setPieChartData(PieData pieData){
         pieChart.setData(pieData);
-        pieChart.invalidate();
-        pieChart.animateY(1000, Easing.EasingOption.EaseInOutQuad);
+        pieChart.invalidate(); //Refresh data in Graph - Has to be called after setting data
+        pieChart.animateY(1000, Easing.EasingOption.EaseInOutQuad); // Cool animation after refreshing the data
     }
 
     private class ToggleButtonListener implements CompoundButton.OnCheckedChangeListener{
@@ -81,6 +83,7 @@ public class fragment_main extends Fragment {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
             controller.addChartData(isChecked);
+            state = isChecked;
         }
     }
 

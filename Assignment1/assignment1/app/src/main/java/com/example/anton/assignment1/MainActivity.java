@@ -12,7 +12,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText etUsername, etPassword;
     private Button btnLogin, btnSignup;
     private Controller controller;
-    private String userName, password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +41,8 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             switch(v.getId()){
                 case R.id.btnLogin:
-                    userName = etUsername.getText().toString();
                     if(controller.login("hej", "hejhej")){
-                        startIntent(userName);
+                        startIntent(etUsername.getText().toString(), etPassword.getText().toString());
                     }
                     break;
                 case R.id.btnSignUp:
@@ -54,9 +52,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void startIntent(String userId){
+    public void startIntent(String userId, String password){
         Intent intent = new Intent(this, UserActivity.class);
-        intent.putExtra("userid", userName);
+        intent.putExtra("userid", userId);
+        intent.putExtra("password", password);
         startActivity(intent);
     }
 
