@@ -33,6 +33,7 @@ public class FragmentSearch extends Fragment {
     private int year = c.get(Calendar.YEAR);
     private int month = c.get(Calendar.MONTH);
     private int day = c.get(Calendar.DAY_OF_MONTH);
+    private int savedPosition;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_search, container, false);
@@ -46,6 +47,8 @@ public class FragmentSearch extends Fragment {
     public void onResume() {
         super.onResume();
         controller.setTvDatesSelected();
+        setSpinnerChoice();
+
     }
 
     private void initializeComponents(View rootView) {
@@ -55,6 +58,7 @@ public class FragmentSearch extends Fragment {
     }
 
     private void registerListeners() {
+        // Needs to be here otherwise a new listener will be added each time
         spinner.setOnItemSelectedListener(new SpinnerListener());
     }
 
@@ -62,26 +66,27 @@ public class FragmentSearch extends Fragment {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.spinnerChoice, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setSelection(savedPosition, false);
     }
 
     private class SpinnerListener implements AdapterView.OnItemSelectedListener {
 
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-            controller.dateSelect(position);
+            Log.v("Message", spinner.getSelectedItem().toString());
+            savedPosition = position;
+            controller.dateSelect(spinner.getSelectedItem().toString());
 
         }
 
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
-
+            // Not needed
         }
     }
 
     public void startDatePicker(){
-        new DatePickerDialog(getActivity(), new toDate(), year, month, day).show();
         new DatePickerDialog(getActivity(), new fromDate(), year, month, day).show();
-
     }
 
     public void setController(Controller controller){
@@ -99,7 +104,10 @@ public class FragmentSearch extends Fragment {
 
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-            tvFromDate.setText("" + year + "-" + month + "-" + dayOfMonth);
+            String date = controller.padDate(year, (month + 1), dayOfMonth);
+            controller.setCustomDateFrom(date);
+            new DatePickerDialog(getActivity(), new toDate(), year, month, day).show();
+
         }
     }
 
@@ -107,7 +115,8 @@ public class FragmentSearch extends Fragment {
 
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-            tvToDate.setText("" + year + "-" + month + "-" +dayOfMonth);
+            String date = controller.padDate(year, (month + 1), dayOfMonth);
+            controller.setCustomDateTo(date);
 
         }
     }

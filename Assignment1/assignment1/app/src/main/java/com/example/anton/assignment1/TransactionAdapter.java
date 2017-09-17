@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 /**
@@ -23,7 +25,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         CardView cv;
-        TextView tvAmount, tvType, tvDate, tvCategory;
+        TextView tvAmount, tvType, tvDate, tvCategory, tvId;
 
         public ViewHolder(View view){
             super(view);
@@ -32,6 +34,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             tvType = (TextView) view.findViewById(R.id.tvType);
             tvDate = (TextView) view.findViewById(R.id.tvDate);
             tvCategory = (TextView) view.findViewById(R.id.tvCategory);
+            tvId = (TextView) view.findViewById(R.id.tvId);
         }
     }
 
@@ -47,6 +50,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         viewHolder.tvType.setText(transactions.get(position).getTitle());
         viewHolder.tvCategory.setText(transactions.get(position).getCategory());
         viewHolder.tvDate.setText(transactions.get(position).getDate());
+        viewHolder.tvId.setText(Integer.toString(transactions.get(position).getId()));
     }
 
     @Override

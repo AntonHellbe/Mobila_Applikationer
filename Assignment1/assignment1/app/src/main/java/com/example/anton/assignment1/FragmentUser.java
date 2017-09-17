@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 
 /**
@@ -17,7 +18,7 @@ import android.widget.Toast;
 
 public class FragmentUser extends Fragment {
 
-    private EditText etUsername, etPassword;
+    private EditText etUsername, etPassword, etName, etLastname;
     private Button editBtn;
     private Controller controller;
 
@@ -35,6 +36,8 @@ public class FragmentUser extends Fragment {
     private void initializeComponents(View rootView) {
         etUsername = (EditText) rootView.findViewById(R.id.etNewUsername);
         etPassword = (EditText) rootView.findViewById(R.id.etNewPassword);
+        etName = (EditText) rootView.findViewById(R.id.etNewName);
+        etLastname = (EditText) rootView.findViewById(R.id.etNewLastname);
         editBtn = (Button) rootView.findViewById(R.id.btnUpdate);
     }
 
@@ -49,16 +52,33 @@ public class FragmentUser extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        controller.updateUsername();
+        controller.setUserDetails();
     }
 
     private class ButtonListener implements View.OnClickListener{
 
         @Override
         public void onClick(View v) {
-            String result = controller.editUser(etUsername.getText().toString(), etPassword.getText().toString());
+            String result = controller.editUser(etUsername.getText().toString(), etName.getText().toString(),
+                    etLastname.getText().toString(), etPassword.getText().toString());
 
             Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void setEtUsername(String text){
+        etUsername.setText(text);
+    }
+
+    public void setEtName(String text){
+        etName.setText(text);
+    }
+
+    public void setEtLastname(String text){
+        etLastname.setText(text);
+    }
+
+    public void setEtPassword(String text){
+        etPassword.setText(text);
     }
 }

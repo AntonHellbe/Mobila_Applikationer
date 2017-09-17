@@ -53,7 +53,8 @@ public class FragmentAdd extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-
+        controller.clearOptions();
+        sCategory.setAdapter(null);
     }
 
     private void initializeComponents(View rootView) {
@@ -119,7 +120,7 @@ public class FragmentAdd extends Fragment{
                                 parseFloat(etAmount.getText().toString()), sCategory.getSelectedItem().toString(), btnDate.getText().toString());
                         controller.addTransaction(trans);
                         Toast.makeText(getActivity(), "Transaction added!", Toast.LENGTH_SHORT).show();
-                        trans.describe();
+                        controller.moveBack(expense);
                     }catch(Exception e){
                         Toast.makeText(getActivity(), "One or more fields missing!", Toast.LENGTH_SHORT).show();
                     }
@@ -133,14 +134,25 @@ public class FragmentAdd extends Fragment{
     private class DatePickerListener implements DatePickerDialog.OnDateSetListener{
 
         public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
-            if(month < 10){
-                String forMmonth = String.format("%02d", (month + 1));
-                btnDate.setText("" + year + "-" + forMmonth + "-" + dayOfMonth);
-            }else {
-                btnDate.setText("" + year + "-" + (month + 1) + "-" + dayOfMonth);
-            }
+            btnDate.setText(controller.padDate(year, (month + 1), dayOfMonth));
 
         }
+    }
+
+    public void clearRadioGroup(){
+        rgType.clearCheck();
+    }
+
+    public void setBtnDate(String text){
+        btnDate.setText(text);
+    }
+
+    public void setEtTitle(String text){
+        etTitle.setText(text);
+    }
+
+    public void setEtAmount(String text){
+        etAmount.setText(text);
     }
 
 

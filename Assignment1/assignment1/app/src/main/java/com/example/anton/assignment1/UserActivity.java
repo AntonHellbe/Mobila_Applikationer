@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.support.v7.widget.Toolbar;
 
 /**
  * Created by Anton on 2017-09-12.
@@ -22,6 +23,7 @@ public class UserActivity extends AppCompatActivity {
     private ListView listView;
     private ActionBarDrawerToggle drawerToggle;
     private Controller controller;
+    private Toolbar toolbar;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +32,7 @@ public class UserActivity extends AppCompatActivity {
         controller = new Controller(this);
         initializeComponenets();
         registerListeners();
-        if(savedInstanceState != null){
-            controller.rescueMission(savedInstanceState);
-        }
+
 
     }
 
@@ -43,6 +43,14 @@ public class UserActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(savedInstanceState != null){
+            controller.rescueMission(savedInstanceState);
+        }
+    }
+
     private void initializeComponenets() {
         Intent intent = getIntent();
         controller.createUser(intent);
@@ -50,7 +58,14 @@ public class UserActivity extends AppCompatActivity {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         listView = (ListView) findViewById(R.id.left_drawer);
         listView.setAdapter(new MenuAdapter(this, titles, imgId));
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.drawer_close, R.string.drawer_open);
+        drawerLayout.setDrawerListener(toggle);
+        toggle.syncState();
+
+
 
 
     }

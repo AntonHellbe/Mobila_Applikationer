@@ -8,15 +8,29 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        >
-    <FrameLayout
+        android:orientation="vertical">
+
+        <include
+            layout="@layout/app_bar_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/container">
+
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+   <!-- <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/container">
+        >
 
-
-    </FrameLayout>
-    </LinearLayout>
+    </LinearLayout> -->
 
     <FrameLayout
         android:id="@+id/content_frame"
@@ -29,6 +43,7 @@
         android:layout_gravity="start"
         android:choiceMode="singleChoice"
         android:divider="#FFF"
+        android:fitsSystemWindows="true"
         android:dividerHeight="0px"
         android:background="#FFF"/>
 

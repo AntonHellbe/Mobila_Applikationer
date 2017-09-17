@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">F5SQLite</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="btnadd">Add items</string>
+    <string name="btnshow">Show highscore</string>
+    <string name="btndeleteall">Clear</string>
+    <string name="btnadd100">Add 100</string>
+
+    <string name="title_activity_highscore">HighscoreActivity</string>
+    <string name="highscore">Highscore</string>
+</resources>

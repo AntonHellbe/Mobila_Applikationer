@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">F5SharedPreferences</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="etString">Mata in text</string>
+    <string name="btnChange">Change text and image</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="country_array">
+        <item>Sweden</item>
+        <item>United Kingdom</item>
+        <item>Denmark</item>
+        <item>France</item>
+        <item>Germany</item>
+        <item>Norway</item>
+        <item>China</item>
+        <item>India</item>
+    </string-array>
+</resources>

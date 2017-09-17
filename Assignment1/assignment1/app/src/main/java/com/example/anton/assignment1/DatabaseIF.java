@@ -1,8 +1,16 @@
 package com.example.anton.assignment1;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Anton on 2017-09-13.
@@ -10,142 +18,296 @@ import java.util.ArrayList;
 
 public class DatabaseIF {
 
+    private TransactionDBHelper transactionDBHelper;
+    private UserDBHelper userDBHelper;
+    private Controller controller;
 
-    public DatabaseIF(){
+    public DatabaseIF(Context context, Controller controller){
+        this.transactionDBHelper = new TransactionDBHelper(context);
+        this.userDBHelper = new UserDBHelper(context);
+        this.controller = controller;
+    }
+
+    public void testData(){
+        ArrayList<Transaction> transz = new ArrayList<>();
+        Transaction trans = new Transaction("Income", "Testing1", "JohnDoe", 50.45f, "Salary", "2017-09-07");
+        Transaction trans1 = new Transaction("Expenditure", "Testing2", "JohnDoe", 60.45f, "Food", "2017-09-05");
+        Transaction trans2 = new Transaction("Expenditure", "Testing3", "JohnDoe", 70.45f, "Leisure", "2017-05-10");
+        Transaction trans3 = new Transaction("Income", "Testing4", "JohnDoe", 77.45f, "Other", "2017-05-20");
+        Transaction trans4 = new Transaction("Expenditure", "Testing5", "JohnDoe", 23.45f, "Accommodation", "2017-03-15");
+        Transaction trans5 = new Transaction("Income", "Testing6", "JohnDoe", 25.45f, "Salary", "2017-01-01");
+        Transaction trans6 = new Transaction("Expenditure", "Testing7", "JohnDoe", 43.45f, "Travel", "2017-06-10");
+        Transaction trans7 = new Transaction("Income", "Testing8", "JohnDoe", 123.45f, "Other", "2017-03-03");
+        transz.add(trans);
+        transz.add(trans1);
+        transz.add(trans2);
+        transz.add(trans3);
+        transz.add(trans4);
+        transz.add(trans5);
+        transz.add(trans6);
+        transz.add(trans7);
+
+        addTransactionList(transz);
+    }
+
+    public void addTransactionList(ArrayList<Transaction> transaction){
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        for(int i = 0; i < transaction.size(); i++){
+            ContentValues values = new ContentValues();
+            values.put(TransactionDBHelper.COLUMN_TYPE, transaction.get(i).getType());
+            values.put(TransactionDBHelper.COLUMN_TITLE, transaction.get(i).getTitle());
+            values.put(TransactionDBHelper.COLUMN_USERID, transaction.get(i).getUserid());
+            values.put(TransactionDBHelper.COLUMN_AMOUNT, transaction.get(i).getAmount());
+            values.put(TransactionDBHelper.COLUMN_CATEGORY, transaction.get(i).getCategory());
+            values.put(TransactionDBHelper.COLUMN_DATE, transaction.get(i).getDate());
+            db.insert(TransactionDBHelper.TABLE_NAME, "", values);
+        }
+    }
+
+    public void addTransaction(Transaction transaction){
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TransactionDBHelper.COLUMN_TYPE, transaction.getType());
+        values.put(TransactionDBHelper.COLUMN_TITLE, transaction.getTitle());
+        values.put(TransactionDBHelper.COLUMN_USERID, transaction.getUserid());
+        values.put(TransactionDBHelper.COLUMN_AMOUNT, transaction.getAmount());
+        values.put(TransactionDBHelper.COLUMN_CATEGORY, transaction.getCategory());
+        values.put(TransactionDBHelper.COLUMN_DATE, transaction.getDate());
+        Log.v("Controller", "" + values);
+        db.insert(TransactionDBHelper.TABLE_NAME, "", values);
+    }
+
+    public ArrayList<Transaction> getIncomeRange(String range){
+        SQLiteDatabase db = transactionDBHelper.getReadableDatabase();
+
+        int idIndex, titleIndex, typeIndex, useridIndex, amountIndex, categoryIndex, dateIndex;
+        String fromDate = "";
+        String toDate = "";
+        switch(range){
+            case "Year":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-365);
+                break;
+            case "Month":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-31);
+                break;
+            case "Week":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-7);
+                break;
+            case "Other":
+                fromDate = controller.getCustomDateFrom();
+                toDate = controller.getCustomDateTo();
+        }
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_TYPE + " = ?" + " AND " + TransactionDBHelper.COLUMN_USERID + " = ?" + " AND "
+                +   "? >= " + TransactionDBHelper.COLUMN_DATE + " AND " + "? <= " + TransactionDBHelper.COLUMN_DATE, new String[]{"Income", controller.getCurrentUserName(), fromDate, toDate});
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
+        titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
+        typeIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TYPE);
+        useridIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_USERID);
+        amountIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_AMOUNT);
+        categoryIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_CATEGORY);
+        dateIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_DATE);
+
+        for(int i = 0; i < cursor.getCount(); i++){
+            cursor.moveToPosition(i);
+            Transaction trans = new Transaction(cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
+                    cursor.getFloat(amountIndex), cursor.getString(categoryIndex), cursor.getString(dateIndex));
+            trans.setId(cursor.getInt(idIndex));
+            transactions.add(trans);
+        }
+        return transactions;
+
 
     }
 
-    public ArrayList<Transaction> getIncome(){
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction("Income", "ababa", "Work", 34.54f, "Salary", "Monday");
-        Transaction transaction1 = new Transaction("Income", "ababa","Mum", 31.54f, "Salary", "Tuesday");
-        Transaction transaction2 = new Transaction("Income", "ababa","Shuffing", 67.54f, "Other", "Fryday");
-        Transaction transaction3 = new Transaction("income", "ababa","Blablba", 83.54f, "Other", "Monday");
-        Transaction transaction4 = new Transaction("income", "ababa","Dingus", 100.54f, "Salary", "assday");
-        transactions.add(transaction);
-        transactions.add(transaction1);
-        transactions.add(transaction2);
-        transactions.add(transaction3);
-        transactions.add(transaction4);
+
+    public ArrayList<Transaction> getExpenditureRange(String range){
+
+        int idIndex, titleIndex, typeIndex, useridIndex, amountIndex, categoryIndex, dateIndex;
+        String fromDate = "";
+        String toDate = "";
+        switch(range){
+            case "Year":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-365);
+                break;
+            case "Month":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-31);
+                break;
+            case "Week":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(-7);
+                break;
+            case "Other":
+                fromDate = controller.getCustomDateFrom();
+                toDate = controller.getCustomDateTo();
+        }
+
+        SQLiteDatabase db = transactionDBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_TYPE + " = ?" + " AND " + TransactionDBHelper.COLUMN_USERID + " = ?" + " AND "
+                +   "? >= " + TransactionDBHelper.COLUMN_DATE + " AND " + "? <= " + TransactionDBHelper.COLUMN_DATE, new String[]{"Expenditure", controller.getCurrentUserName(), fromDate, toDate});
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
+        titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
+        typeIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TYPE);
+        useridIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_USERID);
+        amountIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_AMOUNT);
+        categoryIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_CATEGORY);
+        dateIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_DATE);
+
+        for(int i = 0; i < cursor.getCount(); i++){
+            cursor.moveToPosition(i);
+            Transaction trans = new Transaction(cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
+                    cursor.getFloat(amountIndex), cursor.getString(categoryIndex), cursor.getString(dateIndex));
+            trans.setId(cursor.getInt(idIndex));
+            transactions.add(trans);
+        }
         return transactions;
     }
 
-    public ArrayList<Transaction> getExpenditures(){
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction("Income", "ababa", "Work", 34.54f, "Salary", "Monday");
-        Transaction transaction1 = new Transaction("Income", "ababa","Mum", 31.54f, "Salary", "Tuesday");
-        Transaction transaction2 = new Transaction("Income", "ababa","Shuffing", 67.54f, "Other", "Fryday");
-        Transaction transaction3 = new Transaction("income", "ababa","Blablba", 83.54f, "Other", "Monday");
-        Transaction transaction4 = new Transaction("income", "ababa","Dingus", 100.54f, "Salary", "assday");
-        transactions.add(transaction);
-        transactions.add(transaction1);
-        transactions.add(transaction2);
-        transactions.add(transaction3);
-        transactions.add(transaction4);
+
+    public Transaction getTransaction(int id){
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        int idIndex, titleIndex, typeIndex, useridIndex, amountIndex, categoryIndex, dateIndex;
+
+        String query = "SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_ID + "=" + id;
+
+        Cursor c = db.rawQuery(query, null);
+
+        idIndex = c.getColumnIndex(TransactionDBHelper.COLUMN_ID);
+        titleIndex = c.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
+        typeIndex = c.getColumnIndex(TransactionDBHelper.COLUMN_TYPE);
+        useridIndex = c.getColumnIndex(TransactionDBHelper.COLUMN_USERID);
+        amountIndex = c.getColumnIndex(TransactionDBHelper.COLUMN_AMOUNT);
+        categoryIndex = c.getColumnIndex(TransactionDBHelper.COLUMN_CATEGORY);
+        dateIndex = c.getColumnIndex(TransactionDBHelper.COLUMN_DATE);
+
+        if(c != null) c.moveToFirst();
+
+
+        Transaction transaction = new Transaction(c.getString(typeIndex), c.getString(titleIndex), c.getString(useridIndex), c.getFloat(amountIndex),
+                c.getString(categoryIndex), c.getString(dateIndex));
+
+        transaction.setId(c.getInt(idIndex));
+
+        return transaction;
+
+    }
+
+    public String getCalculatedDate(int days) {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd");
+        if(days < -300){
+            cal.add(Calendar.YEAR, -1);
+        }else if(days < - 20){
+            cal.add(Calendar.MONTH, -1);
+        }else {
+            cal.add(Calendar.DAY_OF_YEAR, days);
+        }
+        Date date = new Date(cal.getTimeInMillis());
+
+        return s.format(date);
+    }
+
+
+
+    public Boolean addUser(String username, String name, String lastname, String password){
+        SQLiteDatabase db = userDBHelper.getWritableDatabase();
+
+        String query = "SELECT * FROM " + UserDBHelper.TABLE_NAME + " WHERE " + UserDBHelper.COLUMN_USERID + " = ?";
+        Cursor c = db.rawQuery(query, new String[]{username});
+
+        if(c.getCount() > 0){
+            return false;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(UserDBHelper.COLUMN_USERID, username);
+        values.put(UserDBHelper.COLUMN_NAME, name);
+        values.put(UserDBHelper.COLUMN_LASTNAME, lastname);
+        values.put(UserDBHelper.COLUMN_PASSWORD, password);
+        db.insert(UserDBHelper.TABLE_NAME, "", values);
+        return true;
+    }
+
+    public Boolean editUser(User oldUser, User newUser){
+        SQLiteDatabase db = userDBHelper.getWritableDatabase();
+
+        if(oldUser.getUsername() != newUser.getUsername()){
+            ArrayList<Transaction> transactions = getAllTransactions(oldUser.getUsername());
+            for(Transaction trans: transactions){
+                trans.setUserid(newUser.getUsername());
+            }
+            addTransactionList(transactions);
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(UserDBHelper.COLUMN_USERID, newUser.getUsername());
+        values.put(UserDBHelper.COLUMN_PASSWORD, newUser.getPassword());
+        db.update(UserDBHelper.TABLE_NAME, values, UserDBHelper.COLUMN_ID + " = " + oldUser.getId(),null);
+        return true;
+    }
+
+    public User loginUser(String username, String password){
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        int idIndex, useridIndex, nameIndex, lastnameIndex, passwordIndex;
+
+        String query = "SELECT * FROM " + UserDBHelper.TABLE_NAME + " WHERE " + UserDBHelper.COLUMN_USERID + "= ?" + " AND " + UserDBHelper.COLUMN_PASSWORD + " = ?" ;
+
+        Cursor c = db.rawQuery(query, new String[]{username, password});
+
+        idIndex = c.getColumnIndex(UserDBHelper.COLUMN_ID);
+        useridIndex = c.getColumnIndex(UserDBHelper.COLUMN_USERID);
+        nameIndex = c.getColumnIndex(UserDBHelper.COLUMN_NAME);
+        lastnameIndex = c.getColumnIndex(UserDBHelper.COLUMN_LASTNAME);
+        passwordIndex = c.getColumnIndex(UserDBHelper.COLUMN_PASSWORD);
+
+        User user;
+        if(c != null && c.moveToFirst()) {
+            c.moveToFirst();
+            user = new User(c.getInt(idIndex), c.getString(useridIndex), c.getString(nameIndex), c.getString(lastnameIndex), c.getString(passwordIndex));
+            c.close();
+        }else{
+            user = null;
+        }
+
+
+
+        return user;
+
+    }
+
+    public ArrayList<Transaction> getAllTransactions(String username){
+        SQLiteDatabase db = transactionDBHelper.getReadableDatabase();
+
+        int idIndex, titleIndex, typeIndex, useridIndex, amountIndex, categoryIndex, dateIndex;
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_USERID + " = ?", new String[]{username});
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
+        titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
+        typeIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TYPE);
+        useridIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_USERID);
+        amountIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_AMOUNT);
+        categoryIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_CATEGORY);
+        dateIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_DATE);
+
+        for(int i = 0; i < cursor.getCount(); i++){
+            cursor.moveToPosition(i);
+            Transaction trans = new Transaction(cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
+                    cursor.getFloat(amountIndex), cursor.getString(categoryIndex), cursor.getString(dateIndex));
+            trans.setId(cursor.getInt(idIndex));
+            transactions.add(trans);
+        }
         return transactions;
 
     }
 
-    public ArrayList<Transaction> getExpendituresYear(){
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction("Income", "ababa", "Work", 34.54f, "Salary", "Monday");
-        Transaction transaction1 = new Transaction("Income", "ababa","Mum", 31.54f, "Salary", "Tuesday");
-        Transaction transaction2 = new Transaction("Income", "ababa","Shuffing", 67.54f, "Other", "Fryday");
-        Transaction transaction3 = new Transaction("income", "ababa","Blablba", 83.54f, "Other", "Monday");
-        Transaction transaction4 = new Transaction("income", "ababa","Dingus", 100.54f, "Salary", "assday");
-        transactions.add(transaction);
-        transactions.add(transaction1);
-        transactions.add(transaction2);
-        transactions.add(transaction3);
-        transactions.add(transaction4);
-
-        return transactions;
-
-    }
-
-    public ArrayList<Transaction> getExpendituresMonth(){
-
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction("Income", "ababa", "Work", 34.54f, "Salary", "Monday");
-        Transaction transaction1 = new Transaction("Income", "ababa","Mum", 31.54f, "Salary", "Tuesday");
-        Transaction transaction2 = new Transaction("Income", "ababa","Shuffing", 67.54f, "Other", "Fryday");
-        Transaction transaction3 = new Transaction("income", "ababa","Blablba", 83.54f, "Other", "Monday");
-        Transaction transaction4 = new Transaction("income", "ababa","Dingus", 100.54f, "Salary", "assday");
-        transactions.add(transaction);
-        transactions.add(transaction1);
-        transactions.add(transaction2);
-        transactions.add(transaction3);
-        transactions.add(transaction4);
-
-        return transactions;
-
-    }
-
-    public ArrayList<Transaction> getExpendituresWeek(){
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction("Income", "ababa", "Work", 34.54f, "Salary", "Monday");
-        Transaction transaction1 = new Transaction("Income", "ababa","Mum", 31.54f, "Salary", "Tuesday");
-        Transaction transaction2 = new Transaction("Income", "ababa","Shuffing", 67.54f, "Other", "Fryday");
-        Transaction transaction3 = new Transaction("income", "ababa","Blablba", 83.54f, "Other", "Monday");
-        Transaction transaction4 = new Transaction("income", "ababa","Dingus", 100.54f, "Salary", "assday");
-        transactions.add(transaction);
-        transactions.add(transaction1);
-        transactions.add(transaction2);
-        transactions.add(transaction3);
-        transactions.add(transaction4);
-
-        return transactions;
-    }
-
-    public ArrayList<Transaction> getIncomeYear(){
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction("Income", "ababa", "Work", 34.54f, "Salary", "Monday");
-        Transaction transaction1 = new Transaction("Income", "ababa","Mum", 31.54f, "Salary", "Tuesday");
-        Transaction transaction2 = new Transaction("Income", "ababa","Shuffing", 67.54f, "Other", "Fryday");
-        Transaction transaction3 = new Transaction("income", "ababa","Blablba", 83.54f, "Other", "Monday");
-        Transaction transaction4 = new Transaction("income", "ababa","Dingus", 100.54f, "Salary", "assday");
-        transactions.add(transaction);
-        transactions.add(transaction1);
-        transactions.add(transaction2);
-        transactions.add(transaction3);
-        transactions.add(transaction4);
-        return transactions;
-
-    }
-
-    public ArrayList<Transaction> getIncomeMonth(){
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction("Income", "ababa", "Work", 34.54f, "Salary", "Monday");
-        Transaction transaction1 = new Transaction("Income", "ababa","Mum", 31.54f, "Salary", "Tuesday");
-        Transaction transaction2 = new Transaction("Income", "ababa","Shuffing", 67.54f, "Other", "Fryday");
-        Transaction transaction3 = new Transaction("income", "ababa","Blablba", 83.54f, "Other", "Monday");
-        Transaction transaction4 = new Transaction("income", "ababa","Dingus", 100.54f, "Salary", "assday");
-        transactions.add(transaction);
-        transactions.add(transaction1);
-        transactions.add(transaction2);
-        transactions.add(transaction3);
-        return transactions;
-
-    }
-
-    public ArrayList<Transaction> getIncomeWeek(){
-        ArrayList<Transaction> transactions = new ArrayList<>();
-        Transaction transaction = new Transaction("Income", "ababa", "Work", 34.54f, "Salary", "Monday");
-        Transaction transaction1 = new Transaction("Income", "ababa","Mum", 31.54f, "Salary", "Tuesday");
-        Transaction transaction2 = new Transaction("Income", "ababa","Shuffing", 67.54f, "Other", "Fryday");
-        Transaction transaction3 = new Transaction("income", "ababa","Blablba", 83.54f, "Other", "Monday");
-        Transaction transaction4 = new Transaction("income", "ababa","Dingus", 100.54f, "Salary", "assday");
-        transactions.add(transaction);
-        transactions.add(transaction1);
-        transactions.add(transaction2);
-        transactions.add(transaction3);
-        transactions.add(transaction4);
-        return transactions;
-
-    }
-
-//    public ArrayList<Transaction> getCustom(){
-//    }
 
 
 }
