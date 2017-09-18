@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -47,7 +48,7 @@ public class FragmentSearch extends Fragment {
     public void onResume() {
         super.onResume();
         controller.setTvDatesSelected();
-        setSpinnerChoice();
+        controller.setSearchSpinner();
 
     }
 
@@ -58,23 +59,36 @@ public class FragmentSearch extends Fragment {
     }
 
     private void registerListeners() {
-        spinner.setOnItemSelectedListener(new SpinnerListener());
+        SpinnerListener spinnerListener = new SpinnerListener();
+        spinner.setOnTouchListener(spinnerListener);
+        spinner.setOnItemSelectedListener(spinnerListener);
+
     }
 
     public void setSpinnerChoice() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.spinnerChoice, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        spinner.setSelection(savedPosition, false);
     }
 
-    private class SpinnerListener implements AdapterView.OnItemSelectedListener {
+    private class SpinnerListener implements AdapterView.OnItemSelectedListener, View.OnTouchListener {
+
+        boolean userSelect = false;
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            userSelect = true;
+            return false;
+        }
 
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
             Log.v("Message", spinner.getSelectedItem().toString());
             savedPosition = position;
-            controller.dateSelect(spinner.getSelectedItem().toString());
+            if(userSelect){
+                controller.dateSelect(spinner.getSelectedItem().toString());
+                userSelect = false;
+            }
 
         }
 
@@ -82,21 +96,12 @@ public class FragmentSearch extends Fragment {
         public void onNothingSelected(AdapterView<?> adapterView) {
             // Not needed
         }
+
+
     }
 
     public void startDatePicker(){
         new DatePickerDialog(getActivity(), new fromDate(), year, month, day).show();
-    }
-
-    public void setController(Controller controller){
-        this.controller = controller;
-    }
-
-    public void setTvFromDate(String text){
-        tvFromDate.setText(text);
-    }
-    public void setTvToDate(String text){
-        tvToDate.setText(text);
     }
 
     class fromDate implements DatePickerDialog.OnDateSetListener{
@@ -118,6 +123,21 @@ public class FragmentSearch extends Fragment {
             controller.setCustomDateTo(date);
 
         }
+    }
+
+    public void setController(Controller controller){
+        this.controller = controller;
+    }
+
+    public void setTvFromDate(String text){
+        tvFromDate.setText(text);
+    }
+    public void setTvToDate(String text){
+        tvToDate.setText(text);
+    }
+
+    public void setSpinner(int choice){
+        spinner.setSelection(choice);
     }
 
 }

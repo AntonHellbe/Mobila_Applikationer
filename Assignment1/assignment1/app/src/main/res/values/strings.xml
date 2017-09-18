@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Assignment1</string>
     <string name="editUser">JohnDoe</string>
-    <string name="passwordField">******</string>
+    <string name="passwordField">Password</string>
     <string name="signup">Sign up</string>
     <string name="login">Login</string>
     <string name="drawer_open">Test</string>

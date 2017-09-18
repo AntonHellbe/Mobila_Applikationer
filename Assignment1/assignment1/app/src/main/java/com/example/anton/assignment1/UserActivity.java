@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -17,8 +18,8 @@ import android.support.v7.widget.Toolbar;
 
 public class UserActivity extends AppCompatActivity {
 
-    private String[] titles = {"Home","","Income", "Expenditure", "Set dates"};
-    private Integer[] imgId = {R.drawable.account_circle, R.drawable.account_edit, R.drawable.chart_bar, R.drawable.chart_bar, R.drawable.calendar_range};
+    private String[] titles = {"Home","","Income", "Expenditure", "Set dates", "Scan Barcode"};
+    private Integer[] imgId = {R.drawable.account_circle, R.drawable.account_edit, R.drawable.chart_bar, R.drawable.chart_bar, R.drawable.calendar_range, R.drawable.barcode_scan};
     private DrawerLayout drawerLayout;
     private ListView listView;
     private Controller controller;
@@ -78,6 +79,27 @@ public class UserActivity extends AppCompatActivity {
 
     private void registerListeners() {
         listView.setOnItemClickListener(new ListViewListener());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //Log.v()
+
+        if(resultCode == RESULT_OK){
+            controller.setAddFragment();
+            controller.updateBarCodeInformation(data.getStringExtra("SCAN_RESULT"));
+
+        }else{
+            controller.changeFragment(0);
+        }
+    }
+
+    public void startBarCodeActivity() {
+        Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+        intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+
+        startActivityForResult(intent, 0);
     }
 
     private class ListViewListener implements AdapterView.OnItemClickListener{

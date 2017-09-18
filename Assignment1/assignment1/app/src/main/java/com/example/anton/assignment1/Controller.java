@@ -9,6 +9,7 @@ import android.util.Log;
 import com.github.mikephil.charting.data.PieData;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -38,6 +39,9 @@ public class Controller {
     private int spinnerCategory1;
     private String customDateFrom = "";
     private String customDateTo = "";
+
+    private ArrayList<String> savedInformation = new ArrayList<>();
+    private int restoreMode = 0;
 
 
     public Controller(MainActivity mainActivity){
@@ -161,7 +165,11 @@ public class Controller {
                     userActivity.setFragment(fragmentSearch, true);
                     break;
                 case 5:
+                    userActivity.startBarCodeActivity();
+                    break;
+                case 6:
                     userActivity.setFragment(fragmentAdd, true);
+                    break;
             }
         }
         currentFragment = position;
@@ -185,7 +193,7 @@ public class Controller {
 
     public void setAddFragment(){
         userActivity.setFragment(fragmentAdd, true);
-        currentFragment = 5;
+        currentFragment = 6;
     }
 
 
@@ -268,6 +276,13 @@ public class Controller {
         outState.putInt("currentFragment", currentFragment);
         outState.putBoolean("piechart", fragmentMain.getState());
         outState.putParcelable("currentUser", currentUser);
+        if(dateSelected.equals("Other")){
+            outState.putString("dateSelected", dateSelected);
+            outState.putString("customDateFrom", customDateFrom);
+            outState.putString("customDateTo", customDateTo);
+        }else{
+            outState.putString("dateSelected", dateSelected);
+        }
 
         return outState;
     }
@@ -276,6 +291,11 @@ public class Controller {
         currentUser = savedInstanceState.getParcelable("currentUser");
         fragmentMain.setState(savedInstanceState.getBoolean("piechart"));
         changeFragment(savedInstanceState.getInt("currentFragment"));
+        dateSelected = savedInstanceState.getString("dateSelected");
+        if(dateSelected.equals("Other")){
+            customDateFrom = savedInstanceState.getString("customDateFrom");
+            customDateTo = savedInstanceState.getString("customDateTo");
+        }
 
     }
 
@@ -379,36 +399,110 @@ public class Controller {
 
     public Bundle saveInformationMainActivity(Bundle outState) {
         outState.putInt("currentFragmentMain", currentFragmentMain);
-        switch(currentFragmentMain){
-            case 0:
-                outState.putString("username", fragmentLogin.getEtUsername());
-                outState.putString("password", fragmentLogin.getEtPassword());
-                break;
-            case 1:
-                outState.putString("username", fragmentSignup.getUsername());
-                outState.putString("name", fragmentSignup.getName());
-                outState.putString("lastname", fragmentSignup.getLastName());
-                outState.putString("password", fragmentSignup.getPassword());
-                break;
-        }
+//        outState.putInt("restoreMode", 1);
+//        switch(currentFragmentMain){
+//            case 0:
+//                outState.putString("username", fragmentLogin.getEtUsername());
+//                outState.putString("password", fragmentLogin.getEtPassword());
+//                break;
+//            case 1:
+//                outState.putString("username", fragmentSignup.getUsername());
+//                outState.putString("name", fragmentSignup.getName());
+//                outState.putString("lastname", fragmentSignup.getLastName());
+//                outState.putString("password", fragmentSignup.getPassword());
+//                break;
+//        }
 
         return outState;
     }
 
     public void setRestoredInformation(Bundle restoredInformation) {
         currentFragmentMain = restoredInformation.getInt("currentFragmentMain");
-        switch(currentFragmentMain){
-            case 0:
-                fragmentLogin.setEtUsername(restoredInformation.getString("username"));
-                fragmentLogin.setEtPassword(restoredInformation.getString("password"));
-                break;
-            case 1:
-                fragmentSignup.setEtUsername(restoredInformation.getString("username"));
-                fragmentSignup.setEtName(restoredInformation.getString("name"));
-                fragmentSignup.setEtLastname(restoredInformation.getString("lastname"));
-                fragmentSignup.setEtPassword(restoredInformation.getString("password"));
-                break;
-        }
+//        restoreMode = restoredInformation.getInt("restoreMode");
+//        switch(currentFragmentMain){
+//            case 0:
+//                savedInformation.add(restoredInformation.getString("username"));
+//                savedInformation.add(restoredInformation.getString("password"));
+//                break;
+//            case 1:
+//                savedInformation.add(restoredInformation.getString("username"));
+//                savedInformation.add(restoredInformation.getString("name"));
+//                savedInformation.add(restoredInformation.getString("lastname"));
+//                savedInformation.add(restoredInformation.getString("password"));
+//                break;
+//        }
         swapMainFragment(currentFragmentMain);
+    }
+
+
+    public void setInformation() {
+        if(restoreMode == 1){
+            switch(currentFragmentMain){
+                case 0:
+                    fragmentLogin.setEtUsername(savedInformation.remove(0));
+                    fragmentLogin.setEtPassword(savedInformation.remove(1));
+                    break;
+                case 1:
+                    fragmentSignup.setEtUsername(savedInformation.remove(0));
+                    fragmentSignup.setEtName(savedInformation.remove(1));
+                    fragmentSignup.setEtLastname(savedInformation.remove(2));
+                    fragmentSignup.setEtPassword(savedInformation.remove(3));
+                    break;
+            }
+
+            restoreMode = 0;
+        }
+
+    }
+
+    public void updateBarCodeInformation(String id) {
+        BarCode barcode = db.getBarCode(id);
+        fragmentAdd.setBarCode(barcode);
+        //fragmentAdd.setEtCategory()
+    }
+
+    public BarCode setBarCodeInformation(BarCode barCode) {
+        if(barCode != null){
+            fragmentAdd.setEtTitle(barCode.getTitle());
+            fragmentAdd.setEtAmount(String.valueOf(barCode.getAmount()));
+            fragmentAdd.checkExpenditure();
+            switch(barCode.getCategory()){
+                case "Travel":
+                    fragmentAdd.setsCategory(0);
+                    break;
+                case "Leisure":
+                    fragmentAdd.setsCategory(1);
+                    break;
+                case "Food":
+                    fragmentAdd.setsCategory(2);
+                    break;
+                case "Other":
+                    fragmentAdd.setsCategory(3);
+                    break;
+                case "Accommodation":
+                    fragmentAdd.setsCategory(4);
+                    break;
+            }
+        }
+
+        return barCode = null;
+    }
+
+    public void setSearchSpinner() {
+        switch(dateSelected){
+            case "Year":
+                fragmentSearch.setSpinner(0);
+                break;
+            case "Month":
+                fragmentSearch.setSpinner(1);
+                break;
+            case "Week":
+                fragmentSearch.setSpinner(2);
+                break;
+            case "Other":
+                fragmentSearch.setSpinner(3);
+
+        }
+
     }
 }

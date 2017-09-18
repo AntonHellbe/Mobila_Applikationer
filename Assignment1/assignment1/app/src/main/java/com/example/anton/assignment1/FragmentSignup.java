@@ -27,6 +27,13 @@ public class FragmentSignup extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //controller.setInformation();
+
+    }
+
     private void registerListeners() {
         btnRegister.setOnClickListener(new ButtonListener());
         btnBack.setOnClickListener(new ButtonListener());

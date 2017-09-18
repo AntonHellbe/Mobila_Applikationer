@@ -20,11 +20,13 @@ public class DatabaseIF {
 
     private TransactionDBHelper transactionDBHelper;
     private UserDBHelper userDBHelper;
+    private BarCodeDBHelper barCodeDBHelper;
     private Controller controller;
 
     public DatabaseIF(Context context, Controller controller){
         this.transactionDBHelper = new TransactionDBHelper(context);
         this.userDBHelper = new UserDBHelper(context);
+        this.barCodeDBHelper = new BarCodeDBHelper(context);
         this.controller = controller;
     }
 
@@ -73,7 +75,6 @@ public class DatabaseIF {
         values.put(TransactionDBHelper.COLUMN_AMOUNT, transaction.getAmount());
         values.put(TransactionDBHelper.COLUMN_CATEGORY, transaction.getCategory());
         values.put(TransactionDBHelper.COLUMN_DATE, transaction.getDate());
-        Log.v("Controller", "" + values);
         db.insert(TransactionDBHelper.TABLE_NAME, "", values);
     }
 
@@ -256,7 +257,10 @@ public class DatabaseIF {
     }
 
     public User loginUser(String username, String password){
-        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        SQLiteDatabase db = userDBHelper.getWritableDatabase();
+//        SQLiteDatabase db1 = transactionDBHelper.getWritableDatabase();
+//        transactionDBHelper.onCreate(db1);
+
         int idIndex, useridIndex, nameIndex, lastnameIndex, passwordIndex;
 
         String query = "SELECT * FROM " + UserDBHelper.TABLE_NAME + " WHERE " + UserDBHelper.COLUMN_USERID + "= ?" + " AND " + UserDBHelper.COLUMN_PASSWORD + " = ?" ;
@@ -307,6 +311,44 @@ public class DatabaseIF {
             transactions.add(trans);
         }
         return transactions;
+
+    }
+
+    public void addBarCode(BarCode barCode){
+        SQLiteDatabase db = barCodeDBHelper.getWritableDatabase();
+//        barCodeDBHelper.onCreate(db);
+        ContentValues values = new ContentValues();
+        values.put(BarCodeDBHelper.COLUMN_ID, barCode.getId());
+        values.put(BarCodeDBHelper.COLUMN_TITLE, barCode.getTitle());
+        values.put(BarCodeDBHelper.COLUMN_CATEGORY, barCode.getCategory());
+        values.put(BarCodeDBHelper.COLUMN_AMOUNT, barCode.getAmount());
+        db.insert(BarCodeDBHelper.TABLE_NAME, "", values);
+    }
+
+    public BarCode getBarCode(String id){
+        SQLiteDatabase db = barCodeDBHelper.getWritableDatabase();
+
+        BarCode barCode = new BarCode("7350015501287", "snus","Leisure", 35.45f);
+        addBarCode(barCode);
+
+        int idIndex, titleIndex, categoryIndex, amountIndex;
+
+        String query = "SELECT * FROM " + BarCodeDBHelper.TABLE_NAME + " WHERE " + BarCodeDBHelper.COLUMN_ID + "= ?";
+
+        Cursor c = db.rawQuery(query, new String[]{id});
+
+        idIndex = c.getColumnIndex(BarCodeDBHelper.COLUMN_ID);
+        titleIndex = c.getColumnIndex(BarCodeDBHelper.COLUMN_TITLE);
+        amountIndex = c.getColumnIndex(BarCodeDBHelper.COLUMN_AMOUNT);
+        categoryIndex = c.getColumnIndex(BarCodeDBHelper.COLUMN_CATEGORY);
+
+        if(c != null) c.moveToFirst();
+
+
+        BarCode barCode1 = new BarCode(c.getString(idIndex), c.getString(titleIndex),c.getString(categoryIndex) , c.getFloat(amountIndex));
+
+
+        return barCode1;
 
     }
 

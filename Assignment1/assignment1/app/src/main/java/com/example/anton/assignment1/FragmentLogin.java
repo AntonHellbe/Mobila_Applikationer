@@ -33,6 +33,12 @@ public class FragmentLogin extends Fragment {
     }
 
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //controller.setInformation();
+    }
+
     private void initializeComponents(View rootView) {
         this.etUsername = (EditText) rootView.findViewById(R.id.etUsername);
         this.etPassword = (EditText) rootView.findViewById(R.id.etPassword);

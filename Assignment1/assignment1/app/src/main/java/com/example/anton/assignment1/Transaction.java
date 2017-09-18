@@ -25,6 +25,17 @@ class Transaction {
         this.date = date;
     }
 
+    public Transaction(int id, String type, String title, String userid, float amount, String category, String date){
+        this.id = id;
+        this.type = type;
+        this.title = title;
+        this.userid = userid;
+        this.amount = amount;
+        this.category = category;
+        this.date = date;
+
+    }
+
     public float getAmount() {
         return amount;
     }

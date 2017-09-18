@@ -42,6 +42,7 @@ public class FragmentAdd extends Fragment{
     private EditText etTitle, etAmount;
     private RadioButton rbIncome, rbExpense;
     private String expense;
+    private BarCode barCode = null;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_add, container, false);
@@ -55,6 +56,7 @@ public class FragmentAdd extends Fragment{
         super.onResume();
         controller.clearOptions();
         sCategory.setAdapter(null);
+        barCode = controller.setBarCodeInformation(barCode);
     }
 
     private void initializeComponents(View rootView) {
@@ -143,6 +145,10 @@ public class FragmentAdd extends Fragment{
         rgType.clearCheck();
     }
 
+    public void checkExpenditure(){
+        rgType.check(R.id.rbExpend);
+    }
+
     public void setBtnDate(String text){
         btnDate.setText(text);
     }
@@ -155,5 +161,16 @@ public class FragmentAdd extends Fragment{
         etAmount.setText(text);
     }
 
+    public void setEtCategory(){
+        //sCategory.setSe
+    }
+
+    public void setBarCode(BarCode barCode){
+        this.barCode = barCode;
+    }
+
+    public void setsCategory(int choice){
+        sCategory.setSelection(choice);
+    }
 
 }

@@ -6,20 +6,36 @@
     android:padding="40dp"
     android:background="@drawable/background">
 
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
     <EditText
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
-        android:backgroundTint="#FFF"
-        />
+        android:ems="10"
+        android:hint="@string/usernameField"
+        android:backgroundTint="#FFF"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
 
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#FFF"
+        android:hint="@string/passwordField"
         android:inputType="textPassword" />
+
+    </android.support.design.widget.TextInputLayout>
 
     <Button
         android:id="@+id/btnSignUp"

@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState = controller.saveInformationMainActivity(outState);
-
         super.onSaveInstanceState(outState);
+
     }
 
     @Override
