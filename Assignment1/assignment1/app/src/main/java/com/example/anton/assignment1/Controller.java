@@ -27,7 +27,9 @@ public class Controller {
     private FragmentLogin fragmentLogin;
     private FragmentSignup fragmentSignup;
     private PieChartHandler pieChartHandler;
+
     private int currentFragment = 0;
+    private int currentFragmentMain = 0;
     private String dateSelected = "Year";
     private DatabaseIF db;
     private User currentUser;
@@ -328,12 +330,12 @@ public class Controller {
 
     public String padDate(int year, int month, int day){
         String strDay = Integer.toString(day);
-        String strMonth = Integer.toString(month);
+        String strMonth = Integer.toString(month + 1);
         if(day < 10){
             strDay = String.format("%02d", day);
         }
         if(month < 10){
-            strMonth = String.format("%02d", month);
+            strMonth = String.format("%02d", (month + 1));
         }
 
         return year + "-" + strMonth + "-" + strDay;
@@ -343,9 +345,11 @@ public class Controller {
         switch(pos){
             case 0:
                 mainActivity.setFragment(fragmentLogin, true);
+                currentFragmentMain = pos;
                 break;
             case 1:
                 mainActivity.setFragment(fragmentSignup, true);
+                currentFragmentMain = pos;
                 break;
         }
     }
@@ -353,7 +357,6 @@ public class Controller {
 
     public void createUser(Intent intent) {
         currentUser = intent.getExtras().getParcelable("currentUser");
-        currentUser.describe();
     }
 
     public void startUserActivity() {
@@ -363,7 +366,49 @@ public class Controller {
     public void setUserDetails() {
         fragmentUser.setEtUsername(currentUser.getUsername());
         fragmentUser.setEtName(currentUser.getName());
-        fragmentUser.setEtLastname(getCurrentUserName());
+        fragmentUser.setEtLastname(currentUser.getLastname());
         fragmentUser.setEtPassword(currentUser.getPassword());
+    }
+
+    public void clearFields() {
+        fragmentSignup.setEtUsername("");
+        fragmentSignup.setEtName("");
+        fragmentSignup.setEtLastname("");
+        fragmentSignup.setEtPassword("");
+    }
+
+    public Bundle saveInformationMainActivity(Bundle outState) {
+        outState.putInt("currentFragmentMain", currentFragmentMain);
+        switch(currentFragmentMain){
+            case 0:
+                outState.putString("username", fragmentLogin.getEtUsername());
+                outState.putString("password", fragmentLogin.getEtPassword());
+                break;
+            case 1:
+                outState.putString("username", fragmentSignup.getUsername());
+                outState.putString("name", fragmentSignup.getName());
+                outState.putString("lastname", fragmentSignup.getLastName());
+                outState.putString("password", fragmentSignup.getPassword());
+                break;
+        }
+
+        return outState;
+    }
+
+    public void setRestoredInformation(Bundle restoredInformation) {
+        currentFragmentMain = restoredInformation.getInt("currentFragmentMain");
+        switch(currentFragmentMain){
+            case 0:
+                fragmentLogin.setEtUsername(restoredInformation.getString("username"));
+                fragmentLogin.setEtPassword(restoredInformation.getString("password"));
+                break;
+            case 1:
+                fragmentSignup.setEtUsername(restoredInformation.getString("username"));
+                fragmentSignup.setEtName(restoredInformation.getString("name"));
+                fragmentSignup.setEtLastname(restoredInformation.getString("lastname"));
+                fragmentSignup.setEtPassword(restoredInformation.getString("password"));
+                break;
+        }
+        swapMainFragment(currentFragmentMain);
     }
 }

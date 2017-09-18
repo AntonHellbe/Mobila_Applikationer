@@ -58,7 +58,6 @@ public class FragmentSearch extends Fragment {
     }
 
     private void registerListeners() {
-        // Needs to be here otherwise a new listener will be added each time
         spinner.setOnItemSelectedListener(new SpinnerListener());
     }
 
@@ -104,7 +103,7 @@ public class FragmentSearch extends Fragment {
 
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-            String date = controller.padDate(year, (month + 1), dayOfMonth);
+            String date = controller.padDate(year, month, dayOfMonth);
             controller.setCustomDateFrom(date);
             new DatePickerDialog(getActivity(), new toDate(), year, month, day).show();
 
@@ -115,7 +114,7 @@ public class FragmentSearch extends Fragment {
 
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-            String date = controller.padDate(year, (month + 1), dayOfMonth);
+            String date = controller.padDate(year, month, dayOfMonth);
             controller.setCustomDateTo(date);
 
         }

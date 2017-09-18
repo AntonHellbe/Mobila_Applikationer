@@ -134,7 +134,7 @@ public class FragmentAdd extends Fragment{
     private class DatePickerListener implements DatePickerDialog.OnDateSetListener{
 
         public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
-            btnDate.setText(controller.padDate(year, (month + 1), dayOfMonth));
+            btnDate.setText(controller.padDate(year, month, dayOfMonth));
 
         }
     }

@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -24,17 +25,18 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        CardView cv;
-        TextView tvAmount, tvType, tvDate, tvCategory, tvId;
+        TextView tvAmount, tvType, tvDate, tvCategory;
+        ImageView imIcon;
+
 
         public ViewHolder(View view){
             super(view);
-            cv = (CardView) view.findViewById(R.id.cv);
             tvAmount = (TextView) view.findViewById(R.id.tvAmount);
             tvType = (TextView) view.findViewById(R.id.tvType);
             tvDate = (TextView) view.findViewById(R.id.tvDate);
             tvCategory = (TextView) view.findViewById(R.id.tvCategory);
-            tvId = (TextView) view.findViewById(R.id.tvId);
+            imIcon = (ImageView) view.findViewById(R.id.imIcon);
+
         }
     }
 
@@ -50,11 +52,29 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         viewHolder.tvType.setText(transactions.get(position).getTitle());
         viewHolder.tvCategory.setText(transactions.get(position).getCategory());
         viewHolder.tvDate.setText(transactions.get(position).getDate());
-        viewHolder.tvId.setText(Integer.toString(transactions.get(position).getId()));
+        viewHolder.imIcon.setImageResource(setIcon(transactions.get(position).getCategory()));
     }
 
     @Override
     public int getItemCount() {
         return transactions.size();
+    }
+
+    public int setIcon(String category){
+        switch(category){
+            case "Other":
+                return R.drawable.other;
+            case "Salary":
+                return R.drawable.salary;
+            case "Accommodation":
+                return R.drawable.accommodation;
+            case "Travel":
+                return R.drawable.travel;
+            case "Leisure":
+                return R.drawable.leisure;
+            case "Food":
+                return R.drawable.food;
+        }
+        return 0;
     }
 }

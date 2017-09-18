@@ -52,6 +52,7 @@ public class FragmentSignup extends Fragment {
             switch(view.getId()){
                 case R.id.btnRegister:
                     String result = controller.signUp();
+                    controller.clearFields();
                     Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
                     controller.swapMainFragment(0);
                     break;
@@ -76,5 +77,21 @@ public class FragmentSignup extends Fragment {
 
     public String getLastName(){
         return etLastname.getText().toString();
+    }
+
+    public void setEtUsername(String text){
+        etUsername.setText(text);
+    }
+
+    public void setEtName(String text){
+        etName.setText(text);
+    }
+
+    public void setEtLastname(String text){
+        etLastname.setText(text);
+    }
+
+    public void setEtPassword(String text){
+        etPassword.setText(text);
     }
 }

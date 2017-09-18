@@ -62,4 +62,20 @@ public class FragmentLogin extends Fragment {
             }
         }
     }
+
+    public String getEtUsername(){
+        return this.etUsername.getText().toString();
+    }
+
+    public String getEtPassword(){
+        return this.etPassword.getText().toString();
+    }
+
+    public void setEtUsername(String text) {
+        this.etUsername.setText(text);
+    }
+
+    public void setEtPassword(String text){
+        this.etPassword.setText(text);
+    }
 }

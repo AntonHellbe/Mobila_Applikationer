@@ -218,6 +218,7 @@ public class DatabaseIF {
 
     public Boolean addUser(String username, String name, String lastname, String password){
         SQLiteDatabase db = userDBHelper.getWritableDatabase();
+//        userDBHelper.onCreate(db);
 
         String query = "SELECT * FROM " + UserDBHelper.TABLE_NAME + " WHERE " + UserDBHelper.COLUMN_USERID + " = ?";
         Cursor c = db.rawQuery(query, new String[]{username});
@@ -237,8 +238,7 @@ public class DatabaseIF {
 
     public Boolean editUser(User oldUser, User newUser){
         SQLiteDatabase db = userDBHelper.getWritableDatabase();
-
-        if(oldUser.getUsername() != newUser.getUsername()){
+        if(!oldUser.getUsername().equalsIgnoreCase(newUser.getUsername())){
             ArrayList<Transaction> transactions = getAllTransactions(oldUser.getUsername());
             for(Transaction trans: transactions){
                 trans.setUserid(newUser.getUsername());
@@ -248,6 +248,8 @@ public class DatabaseIF {
 
         ContentValues values = new ContentValues();
         values.put(UserDBHelper.COLUMN_USERID, newUser.getUsername());
+        values.put(UserDBHelper.COLUMN_NAME, newUser.getName());
+        values.put(UserDBHelper.COLUMN_LASTNAME, newUser.getLastname());
         values.put(UserDBHelper.COLUMN_PASSWORD, newUser.getPassword());
         db.update(UserDBHelper.TABLE_NAME, values, UserDBHelper.COLUMN_ID + " = " + oldUser.getId(),null);
         return true;

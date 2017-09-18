@@ -21,7 +21,6 @@ public class UserActivity extends AppCompatActivity {
     private Integer[] imgId = {R.drawable.account_circle, R.drawable.account_edit, R.drawable.chart_bar, R.drawable.chart_bar, R.drawable.calendar_range};
     private DrawerLayout drawerLayout;
     private ListView listView;
-    private ActionBarDrawerToggle drawerToggle;
     private Controller controller;
     private Toolbar toolbar;
 

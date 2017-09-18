@@ -24,7 +24,6 @@ public class MenuAdapter extends ArrayAdapter<String> {
     public MenuAdapter(@NonNull Context context, @NonNull String[] objects, Integer[] imgId) {
         super(context, R.layout.row_layout, objects);
         layoutInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
-
         this.imgId = imgId;
     }
 
@@ -49,7 +48,6 @@ public class MenuAdapter extends ArrayAdapter<String> {
     }
 
     class ViewHolder{
-
         TextView textView;
         ImageView imageView;
     }
