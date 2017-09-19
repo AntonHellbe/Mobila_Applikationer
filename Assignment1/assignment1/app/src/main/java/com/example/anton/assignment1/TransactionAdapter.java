@@ -54,19 +54,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        final ViewHolder vh = viewHolder;
         viewHolder.tvAmount.setText(String.valueOf(transactions.get(position).getAmount()) + " kr");
         viewHolder.tvType.setText(transactions.get(position).getTitle());
         viewHolder.tvCategory.setText(transactions.get(position).getCategory());
         viewHolder.tvDate.setText(transactions.get(position).getDate());
         viewHolder.imIcon.setImageResource(setIcon(transactions.get(position).getCategory()));
         viewHolder.tvId.setText(String.valueOf(transactions.get(position).getId()));
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.v("TransactionAdapter", vh.tvId.getText().toString());
-            }
-        });
     }
 
     @Override

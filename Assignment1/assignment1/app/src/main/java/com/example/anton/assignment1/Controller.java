@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import static java.lang.Float.parseFloat;
+
 public class Controller {
 
-    private String username = "hej";
-    private String password = "hejhej";
     private UserActivity userActivity;
     private MainActivity mainActivity;
     private FragmentIncome fragmentIncome;
@@ -27,8 +27,10 @@ public class Controller {
     private FragmentAdd fragmentAdd;
     private FragmentLogin fragmentLogin;
     private FragmentSignup fragmentSignup;
+    private FragmentTransaction fragmentTransaction;
     private PieChartHandler pieChartHandler;
     private String fromFragment = "";
+    private Boolean informationSaved = false;
 
     private int currentFragment = 0;
     private int currentFragmentMain = 0;
@@ -40,9 +42,9 @@ public class Controller {
     private int spinnerCategory1;
     private String customDateFrom = "";
     private String customDateTo = "";
+    private int transactionId = 0;
 
-    private ArrayList<String> savedInformation = new ArrayList<>();
-    private int restoreMode = 0;
+    private ArrayList<String> rescuedInformation = null;
 
 
     public Controller(MainActivity mainActivity){
@@ -67,10 +69,12 @@ public class Controller {
         this.fragmentUser = new FragmentUser();
         this.fragmentSearch = new FragmentSearch();
         this.fragmentAdd = new FragmentAdd();
+        this.fragmentTransaction = new FragmentTransaction();
 
         this.pieChartHandler = new PieChartHandler();
         this.db = new DatabaseIF(userActivity, this);
 
+        fragmentTransaction.setController(this);
         fragmentAdd.setController(this);
         fragmentMain.setController(this);
         fragmentIncome.setController(this);
@@ -197,28 +201,28 @@ public class Controller {
         }else{
             fromFragment = "Income";
         }
-        changeFragment(6);
+        currentFragment = 6;
+        changeFragment(currentFragment);
     }
 
 
 
     public void setTransactionAdapter() {
-        if(!fromFragment.equals("")){
-            if(fromFragment.equals("Expenditure")){
+        if (!fromFragment.equals("")) {
+            if (fromFragment.equals("Expenditure")) {
                 currentFragment = 3;
-            }else{
+            } else if (fromFragment.equals("Income")) {
                 currentFragment = 2;
             }
         }
-        if(currentFragment == 3){
+
+        if (currentFragment == 3) {
             fragmentExpenditure.setAdapter(db.getExpenditureRange(dateSelected));
-        }else{
+        } else {
             fragmentIncome.setAdapter(db.getIncomeRange(dateSelected));
         }
 
         fromFragment = "";
-
-
     }
 
     public void dateSelect(String choice) {
@@ -302,6 +306,17 @@ public class Controller {
             outState.putString("dateSelected", dateSelected);
         }
 
+        if(currentFragment == 6){
+            outState.putInt("rbChecked", fragmentAdd.getCheckId());
+            outState.putString("categories", fragmentAdd.getsCategory());
+            outState.putString("title", fragmentAdd.getEtTitle());
+            outState.putString("amount", fragmentAdd.getEtAmount());
+            outState.putString("date", fragmentAdd.getBtnDate());
+            outState.putString("barcodeid", fragmentAdd.getEtBarCodeIt());
+            outState.putBoolean("savedInformation", informationSaved = true);
+
+        }
+
         return outState;
     }
 
@@ -310,10 +325,23 @@ public class Controller {
         fragmentMain.setState(savedInstanceState.getBoolean("piechart"));
         changeFragment(savedInstanceState.getInt("currentFragment"));
         dateSelected = savedInstanceState.getString("dateSelected");
+        informationSaved = savedInstanceState.getBoolean("savedInformation");
+
         if(dateSelected.equals("Other")){
             customDateFrom = savedInstanceState.getString("customDateFrom");
             customDateTo = savedInstanceState.getString("customDateTo");
         }
+
+        if(informationSaved){
+            rescuedInformation = new ArrayList<>();
+            rescuedInformation.add(Integer.toString(savedInstanceState.getInt("rbChecked")));
+            rescuedInformation.add(savedInstanceState.getString("categories"));
+            rescuedInformation.add(savedInstanceState.getString("title"));
+            rescuedInformation.add(savedInstanceState.getString("amount"));
+            rescuedInformation.add(savedInstanceState.getString("date"));
+            rescuedInformation.add(savedInstanceState.getString("barcodeid"));
+        }
+        informationSaved = false;
 
     }
 
@@ -329,17 +357,38 @@ public class Controller {
     }
 
 
-    public void addTransaction(Transaction trans) {
-        db.addTransaction(trans);
+    public String addTransaction() {
+        if(fragmentAdd.getExpense().equals("") || fragmentAdd.getEtTitle().equals("") || currentUser.getUsername().equals("") ||
+                fragmentAdd.getEtAmount().equals("") || fragmentAdd.getsCategory().equals("") || fragmentAdd.getBtnDate().equals("")){
+            return "Not all fields filled in";
+        }
+        try{
+            Transaction trans = new Transaction(fragmentAdd.getExpense(), fragmentAdd.getEtTitle(), currentUser.getUsername(),
+                    parseFloat(fragmentAdd.getEtAmount()), fragmentAdd.getsCategory(), fragmentAdd.getBtnDate());
+            db.addTransaction(trans);
+        }catch(Exception e){
+            return "Something went wrong!";
+        }
+
+        if(!fragmentAdd.getEtBarCodeIt().equals("Press to scan barcode")){
+            BarCode barCode = new BarCode(fragmentAdd.getEtBarCodeIt(), fragmentAdd.getEtTitle(), fragmentAdd.getsCategory(), parseFloat(fragmentAdd.getEtAmount()));
+            if(db.addBarCode(barCode)){
+                Log.e("BarCode", "Barcode added successfully");
+            }
+        }
+
+        return "Transaction added";
     }
 
     public void moveBack(String expense) {
         switch(expense){
             case "Income":
-                changeFragment(2);
+                currentFragment = 2;
+                changeFragment(currentFragment);
                 break;
             case "Expenditure":
-                changeFragment(3);
+                currentFragment = 3;
+                changeFragment(currentFragment);
                 break;
         }
     }
@@ -349,6 +398,7 @@ public class Controller {
         fragmentAdd.setBtnDate("YYYY-MM-DD");
         fragmentAdd.setEtAmount("");
         fragmentAdd.setEtTitle("");
+        fragmentAdd.setEtBarCodeId("Press to scan barcode");
     }
 
     public String getCalculatedDate(int days) {
@@ -426,10 +476,15 @@ public class Controller {
     }
 
 
-    public void updateBarCodeInformation(String id) {
+    public void updateBarCodeInformation(Intent data) {
+        String id = data.getStringExtra("SCAN_RESULT");
         BarCode barcode = db.getBarCode(id);
-        fragmentAdd.setBarCode(barcode);
-        //fragmentAdd.setEtCategory()
+        if(barcode != null){
+            fragmentAdd.setBarCode(barcode);
+        }else{
+            fragmentAdd.setBarCodeId(id);
+        }
+
     }
 
     public BarCode setBarCodeInformation(BarCode barCode) {
@@ -437,6 +492,9 @@ public class Controller {
             fragmentAdd.setEtTitle(barCode.getTitle());
             fragmentAdd.setEtAmount(String.valueOf(barCode.getAmount()));
             fragmentAdd.checkExpenditure();
+            fragmentAdd.setExpense("Expenditure");
+            fragmentAdd.setEtBarCodeId(barCode.getId());
+
             switch(barCode.getCategory()){
                 case "Travel":
                     fragmentAdd.setsCategory(0);
@@ -454,9 +512,19 @@ public class Controller {
                     fragmentAdd.setsCategory(4);
                     break;
             }
+
         }
 
+        setFromFragment();
+
         return barCode = null;
+    }
+
+    public String setBarId(String id){
+        if(!id.equals("")){
+            fragmentAdd.setEtBarCodeId(id);
+        }
+        return id = "";
     }
 
     public void setSearchSpinner() {
@@ -476,12 +544,31 @@ public class Controller {
             case "Other":
                 fragmentSearch.setSpinner(4);
                 break;
-
         }
-
     }
 
     public void setFromFragment(){
         this.fromFragment = "";
     }
+
+    public void startBarCodeActivity(){
+        userActivity.startBarCodeActivity();
+    }
+
+    public void possibleRescueMission() {
+        if(rescuedInformation != null){
+            fragmentAdd.setRgType(Integer.parseInt(rescuedInformation.get(0)));;
+            fragmentAdd.setEtTitle(rescuedInformation.get(2));
+            fragmentAdd.setEtAmount(rescuedInformation.get(3));
+            fragmentAdd.setBtnDate(rescuedInformation.get(4));
+            fragmentAdd.setEtBarCodeId(rescuedInformation.get(5));
+            rescuedInformation = null;
+        }
+
+    }
+
+    public void setTransactionInformation() {
+        Transaction trans = db.getTransaction(transactionId);
+    }
 }
+

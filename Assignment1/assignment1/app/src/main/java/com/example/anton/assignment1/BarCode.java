@@ -1,5 +1,7 @@
 package com.example.anton.assignment1;
 
+import android.util.Log;
+
 /**
  * Created by Anton on 2017-09-18.
  */
@@ -40,5 +42,9 @@ public class BarCode {
 
     public String getId() {
         return id;
+    }
+
+    public void describe(){
+        Log.e("Barcode", this.id + this.title + this.category + this.amount);
     }
 }

@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -39,10 +40,11 @@ public class FragmentAdd extends Fragment{
     private RadioGroup rgType;
     private Spinner sCategory;
     private Button btnDate, btnAdd;
-    private EditText etTitle, etAmount;
+    private EditText etTitle, etAmount, etBarCodeId;
     private RadioButton rbIncome, rbExpense;
-    private String expense;
+    private String expense = "";
     private BarCode barCode = null;
+    private String barCodeId = "";
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_add, container, false);
@@ -54,9 +56,9 @@ public class FragmentAdd extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        controller.clearOptions();
-        sCategory.setAdapter(null);
+        controller.possibleRescueMission();
         barCode = controller.setBarCodeInformation(barCode);
+        barCodeId = controller.setBarId(barCodeId);
     }
 
     private void initializeComponents(View rootView) {
@@ -64,6 +66,7 @@ public class FragmentAdd extends Fragment{
         rbIncome = (RadioButton) rootView.findViewById(R.id.rbInc);
         etTitle = (EditText) rootView.findViewById(R.id.etTitle);
         etAmount = (EditText) rootView.findViewById(R.id.etAmount);
+        etBarCodeId = (EditText) rootView.findViewById(R.id.etBarCodeId);
         rgType = (RadioGroup) rootView.findViewById(R.id.rgType);
         sCategory = (Spinner) rootView.findViewById(R.id.sCategory);
         btnDate = (Button) rootView.findViewById(R.id.btnDate);
@@ -80,6 +83,7 @@ public class FragmentAdd extends Fragment{
             rgType.setOnCheckedChangeListener(new RadioGroupListener());
             btnDate.setOnClickListener(new ButtonListener());
             btnAdd.setOnClickListener(new ButtonListener());
+            etBarCodeId.setOnClickListener(new BarCodeScanner());
         }
     }
 
@@ -89,6 +93,15 @@ public class FragmentAdd extends Fragment{
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sCategory.setAdapter(adapter);
     }
+
+    public String getBarCodeId() {
+        return barCodeId;
+    }
+
+    public void setBarCodeId(String barCodeId) {
+        this.barCodeId = barCodeId;
+    }
+
 
     private class RadioGroupListener implements RadioGroup.OnCheckedChangeListener{
 
@@ -117,19 +130,19 @@ public class FragmentAdd extends Fragment{
                     new DatePickerDialog(getActivity(), new DatePickerListener(), cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
                     break;
                 case R.id.btnAdd:
-                    try{
-                        Transaction trans = new Transaction(expense, etTitle.getText().toString(), controller.getCurrentUserName(),
-                                parseFloat(etAmount.getText().toString()), sCategory.getSelectedItem().toString(), btnDate.getText().toString());
-                        controller.addTransaction(trans);
-                        Toast.makeText(getActivity(), "Transaction added!", Toast.LENGTH_SHORT).show();
-                        controller.moveBack(expense);
-                    }catch(Exception e){
-                        Toast.makeText(getActivity(), "One or more fields missing!", Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-
-
+                    String result = controller.addTransaction();
+                    Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
+                    controller.clearOptions();
+                    controller.moveBack(expense);
             }
+        }
+    }
+
+    private class BarCodeScanner implements View.OnClickListener{
+
+        @Override
+        public void onClick(View view) {
+            controller.startBarCodeActivity();
         }
     }
 
@@ -141,6 +154,10 @@ public class FragmentAdd extends Fragment{
         }
     }
 
+    public void setRgType(int id){
+        rgType.check(id);
+    }
+
     public void clearRadioGroup(){
         rgType.clearCheck();
     }
@@ -148,22 +165,30 @@ public class FragmentAdd extends Fragment{
     public void checkExpenditure(){
         rgType.check(R.id.rbExpend);
     }
-
     public void setBtnDate(String text){
         btnDate.setText(text);
+    }
+
+    public String getBtnDate(){
+        return btnDate.getText().toString();
     }
 
     public void setEtTitle(String text){
         etTitle.setText(text);
     }
 
+    public String getEtTitle(){
+        return etTitle.getText().toString();
+    }
+
     public void setEtAmount(String text){
         etAmount.setText(text);
     }
 
-    public void setEtCategory(){
-        //sCategory.setSe
+    public String getEtAmount(){
+        return etAmount.getText().toString();
     }
+
 
     public void setBarCode(BarCode barCode){
         this.barCode = barCode;
@@ -171,6 +196,30 @@ public class FragmentAdd extends Fragment{
 
     public void setsCategory(int choice){
         sCategory.setSelection(choice);
+    }
+
+    public String getsCategory(){
+        return sCategory.getSelectedItem().toString();
+    }
+
+    public void setExpense(String text){
+        this.expense = text;
+    }
+
+    public String getExpense(){
+        return this.expense;
+    }
+
+    public void setEtBarCodeId(String text){
+        etBarCodeId.setText(text);
+    }
+
+    public String getEtBarCodeIt(){
+        return this.etBarCodeId.getText().toString();
+    }
+
+    public int getCheckId(){
+        return rgType.getCheckedRadioButtonId();
     }
 
 }

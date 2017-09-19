@@ -86,8 +86,8 @@ public class UserActivity extends AppCompatActivity {
         //Log.v()
 
         if(resultCode == RESULT_OK){
+            controller.updateBarCodeInformation(data);
             controller.setAddFragment();
-            controller.updateBarCodeInformation(data.getStringExtra("SCAN_RESULT"));
 
         }else{
             controller.changeFragment(0);
@@ -97,7 +97,6 @@ public class UserActivity extends AppCompatActivity {
     public void startBarCodeActivity() {
         Intent intent = new Intent("com.google.zxing.client.android.SCAN");
         intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
-
         startActivityForResult(intent, 0);
     }
 

@@ -54,4 +54,5 @@
     <string name="newName">New Name</string>
     <string name="newLastname">New Lastname</string>
     <string name="greeting">Here is a summary of your expenditures and income</string>
+    <string name="tvBarcode">Press to scan barcode</string>
 </resources>
