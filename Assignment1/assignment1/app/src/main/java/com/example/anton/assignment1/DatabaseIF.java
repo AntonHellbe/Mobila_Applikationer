@@ -115,9 +115,8 @@ public class DatabaseIF {
 
         for(int i = 0; i < cursor.getCount(); i++){
             cursor.moveToPosition(i);
-            Transaction trans = new Transaction(cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
+            Transaction trans = new Transaction(cursor.getInt(idIndex), cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
                     cursor.getFloat(amountIndex), cursor.getString(categoryIndex), cursor.getString(dateIndex));
-            trans.setId(cursor.getInt(idIndex));
             transactions.add(trans);
         }
         return transactions;
@@ -144,6 +143,10 @@ public class DatabaseIF {
                 fromDate = getCalculatedDate(0);
                 toDate = getCalculatedDate(-7);
                 break;
+            case "Today":
+                fromDate = getCalculatedDate(0);
+                toDate = getCalculatedDate(0);
+                break;
             case "Other":
                 fromDate = controller.getCustomDateFrom();
                 toDate = controller.getCustomDateTo();
@@ -163,9 +166,8 @@ public class DatabaseIF {
 
         for(int i = 0; i < cursor.getCount(); i++){
             cursor.moveToPosition(i);
-            Transaction trans = new Transaction(cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
+            Transaction trans = new Transaction(cursor.getInt(idIndex), cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
                     cursor.getFloat(amountIndex), cursor.getString(categoryIndex), cursor.getString(dateIndex));
-            trans.setId(cursor.getInt(idIndex));
             transactions.add(trans);
         }
         return transactions;
@@ -191,10 +193,9 @@ public class DatabaseIF {
         if(c != null) c.moveToFirst();
 
 
-        Transaction transaction = new Transaction(c.getString(typeIndex), c.getString(titleIndex), c.getString(useridIndex), c.getFloat(amountIndex),
+        Transaction transaction = new Transaction(c.getInt(idIndex), c.getString(typeIndex), c.getString(titleIndex), c.getString(useridIndex), c.getFloat(amountIndex),
                 c.getString(categoryIndex), c.getString(dateIndex));
 
-        transaction.setId(c.getInt(idIndex));
 
         return transaction;
 
@@ -305,9 +306,8 @@ public class DatabaseIF {
 
         for(int i = 0; i < cursor.getCount(); i++){
             cursor.moveToPosition(i);
-            Transaction trans = new Transaction(cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
+            Transaction trans = new Transaction(cursor.getInt(idIndex), cursor.getString(typeIndex), cursor.getString(titleIndex), cursor.getString(useridIndex),
                     cursor.getFloat(amountIndex), cursor.getString(categoryIndex), cursor.getString(dateIndex));
-            trans.setId(cursor.getInt(idIndex));
             transactions.add(trans);
         }
         return transactions;
@@ -323,6 +323,20 @@ public class DatabaseIF {
         values.put(BarCodeDBHelper.COLUMN_CATEGORY, barCode.getCategory());
         values.put(BarCodeDBHelper.COLUMN_AMOUNT, barCode.getAmount());
         db.insert(BarCodeDBHelper.TABLE_NAME, "", values);
+    }
+
+    public void addBarCodeList(ArrayList<BarCode> barCodes){
+        SQLiteDatabase db = barCodeDBHelper.getWritableDatabase();
+//        barCodeDBHelper.onCreate(db);
+        for(BarCode barcode: barCodes){
+            ContentValues values = new ContentValues();
+            values.put(BarCodeDBHelper.COLUMN_ID, barcode.getId());
+            values.put(BarCodeDBHelper.COLUMN_TITLE, barcode.getTitle());
+            values.put(BarCodeDBHelper.COLUMN_CATEGORY, barcode.getCategory());
+            values.put(BarCodeDBHelper.COLUMN_AMOUNT, barcode.getAmount());
+            db.insert(BarCodeDBHelper.TABLE_NAME, "", values);
+        }
+
     }
 
     public BarCode getBarCode(String id){

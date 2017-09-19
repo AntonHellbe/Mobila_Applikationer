@@ -90,11 +90,10 @@
                 android:id="@+id/etAmount"/>
         </LinearLayout>
 
-        <Button
+        <com.example.anton.assignment1.CustomButton
             android:id="@+id/btnDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
             android:text="@string/dateFields" />
 
         <Button

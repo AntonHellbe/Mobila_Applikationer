@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -20,7 +22,6 @@ import java.util.ArrayList;
 public class FragmentIncome extends Fragment {
 
     private RecyclerView recyclerView;
-    private ArrayList<Transaction> income = new ArrayList<>();
     private Controller controller;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter transactionAdapter;
@@ -41,7 +42,7 @@ public class FragmentIncome extends Fragment {
         return rootView;
     }
 
-    private void registerListeners() {
+    private void registerListeners(){
         fabAdd.setOnClickListener(new FABListener());
     }
 
@@ -70,5 +71,6 @@ public class FragmentIncome extends Fragment {
             controller.setAddFragment();
         }
     }
+
 
 }

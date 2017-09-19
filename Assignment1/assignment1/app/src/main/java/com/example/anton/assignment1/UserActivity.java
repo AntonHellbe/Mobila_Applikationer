@@ -38,7 +38,6 @@ public class UserActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-
         outState = controller.saveInformation(outState);
         super.onSaveInstanceState(outState);
     }
@@ -62,7 +61,7 @@ public class UserActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.drawer_close, R.string.drawer_open);
-        drawerLayout.setDrawerListener(toggle);
+        //drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
 
@@ -107,6 +106,8 @@ public class UserActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
             controller.changeFragment(position);
+            controller.setFromFragment();
+            drawerLayout.closeDrawers();
         }
     }
 

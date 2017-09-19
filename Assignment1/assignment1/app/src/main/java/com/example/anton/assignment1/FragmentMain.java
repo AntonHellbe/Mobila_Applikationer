@@ -19,6 +19,8 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 /**
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 public class FragmentMain extends Fragment {
 
     private Controller controller;
-    private TextView tvUsername;
+    private TextView tvUsername, tvDisplayInformation;
     private PieChart pieChart;
     private ToggleButton tbBtn;
     private Boolean state = false;
@@ -46,14 +48,15 @@ public class FragmentMain extends Fragment {
 
     private void initializeComponents(View rootView) {
         tvUsername = (TextView) rootView.findViewById(R.id.tvDisplayUsername);
+        tvDisplayInformation = (TextView) rootView.findViewById(R.id.tvDisplayInformation);
         tbBtn = (ToggleButton) rootView.findViewById(R.id.tbPieChart);
         pieChart = (PieChart) rootView.findViewById(R.id.pcExpenditure);
-        pieChart.setHoleRadius(40f);
-        pieChart.setTransparentCircleAlpha(0);
+        pieChart.setHoleRadius(30);
+        pieChart.setTransparentCircleAlpha(70);
+        pieChart.setTransparentCircleRadius(35);
         pieChart.getDescription().setText("");
         pieChart.setEntryLabelColor(Color.BLACK);
         pieChart.setEntryLabelTextSize(10f);
-        //pieChart.setDescription();
     }
 
 
@@ -109,6 +112,10 @@ public class FragmentMain extends Fragment {
 
     public void setState(Boolean state){
         this.state = state;
+    }
+
+    public void setTvDisplayInformation(String text){
+        this.tvDisplayInformation.setText(text);
     }
 
 }

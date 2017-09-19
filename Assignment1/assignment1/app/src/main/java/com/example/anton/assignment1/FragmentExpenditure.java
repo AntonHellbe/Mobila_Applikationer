@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,13 @@ public class FragmentExpenditure extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e("FragExpenditure", "We are called");
+        controller.setTransactionAdapter();
+    }
+
     private void registerListeners() {
         fabAdd.setOnClickListener(new FABActionListener());
     }
@@ -55,12 +63,6 @@ public class FragmentExpenditure extends Fragment {
     public void setAdapter(ArrayList<Transaction> transactionArrayList){
         transactionAdapter = new TransactionAdapter(transactionArrayList);
         recyclerView.setAdapter(transactionAdapter);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        controller.setTransactionAdapter();
     }
 
     private class FABActionListener implements View.OnClickListener{

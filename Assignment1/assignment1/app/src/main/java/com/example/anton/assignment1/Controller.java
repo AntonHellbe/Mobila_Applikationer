@@ -28,6 +28,7 @@ public class Controller {
     private FragmentLogin fragmentLogin;
     private FragmentSignup fragmentSignup;
     private PieChartHandler pieChartHandler;
+    private String fromFragment = "";
 
     private int currentFragment = 0;
     private int currentFragmentMain = 0;
@@ -147,32 +148,31 @@ public class Controller {
 
 
     public void changeFragment(int position) {
-        if(position != currentFragment){
-            switch(position){
-                case 0:
-                    userActivity.setFragment(fragmentMain, true);
-                    break;
-                case 1:
-                    userActivity.setFragment(fragmentUser, true);
-                    break;
-                case 2:
-                    userActivity.setFragment(fragmentIncome, true);
-                    break;
-                case 3:
-                    userActivity.setFragment(fragmentExpenditure, true);
-                    break;
-                case 4:
-                    userActivity.setFragment(fragmentSearch, true);
-                    break;
-                case 5:
-                    userActivity.startBarCodeActivity();
-                    break;
-                case 6:
-                    userActivity.setFragment(fragmentAdd, true);
-                    break;
-            }
+        switch(position){
+            case 0:
+                userActivity.setFragment(fragmentMain, true);
+                break;
+            case 1:
+                userActivity.setFragment(fragmentUser, true);
+                break;
+            case 2:
+                userActivity.setFragment(fragmentIncome, true);
+                break;
+            case 3:
+                userActivity.setFragment(fragmentExpenditure, true);
+                break;
+            case 4:
+                userActivity.setFragment(fragmentSearch, true);
+                break;
+            case 5:
+                userActivity.startBarCodeActivity();
+                break;
+            case 6:
+                userActivity.setFragment(fragmentAdd, true);
+                break;
         }
         currentFragment = position;
+        //fromFragment = "";
     }
 
     public void addChartData(Boolean state) {
@@ -192,18 +192,32 @@ public class Controller {
     }
 
     public void setAddFragment(){
-        userActivity.setFragment(fragmentAdd, true);
-        currentFragment = 6;
+        if(currentFragment == 3){
+            fromFragment = "Expenditure";
+        }else{
+            fromFragment = "Income";
+        }
+        changeFragment(6);
     }
 
 
 
     public void setTransactionAdapter() {
+        if(!fromFragment.equals("")){
+            if(fromFragment.equals("Expenditure")){
+                currentFragment = 3;
+            }else{
+                currentFragment = 2;
+            }
+        }
         if(currentFragment == 3){
             fragmentExpenditure.setAdapter(db.getExpenditureRange(dateSelected));
         }else{
             fragmentIncome.setAdapter(db.getIncomeRange(dateSelected));
         }
+
+        fromFragment = "";
+
 
     }
 
@@ -235,6 +249,10 @@ public class Controller {
             case "Week":
                 fragmentSearch.setTvFromDate("From: " + getCalculatedDate(0));
                 fragmentSearch.setTvToDate("To: " + getCalculatedDate(-7));
+                break;
+            case "Today":
+                fragmentSearch.setTvFromDate("From: " + getCalculatedDate(0));
+                fragmentSearch.setTvToDate("To: " + getCalculatedDate(0));
                 break;
             case "Other":
                 fragmentSearch.setTvFromDate("From: " + customDateFrom);
@@ -399,61 +417,14 @@ public class Controller {
 
     public Bundle saveInformationMainActivity(Bundle outState) {
         outState.putInt("currentFragmentMain", currentFragmentMain);
-//        outState.putInt("restoreMode", 1);
-//        switch(currentFragmentMain){
-//            case 0:
-//                outState.putString("username", fragmentLogin.getEtUsername());
-//                outState.putString("password", fragmentLogin.getEtPassword());
-//                break;
-//            case 1:
-//                outState.putString("username", fragmentSignup.getUsername());
-//                outState.putString("name", fragmentSignup.getName());
-//                outState.putString("lastname", fragmentSignup.getLastName());
-//                outState.putString("password", fragmentSignup.getPassword());
-//                break;
-//        }
-
         return outState;
     }
 
     public void setRestoredInformation(Bundle restoredInformation) {
         currentFragmentMain = restoredInformation.getInt("currentFragmentMain");
-//        restoreMode = restoredInformation.getInt("restoreMode");
-//        switch(currentFragmentMain){
-//            case 0:
-//                savedInformation.add(restoredInformation.getString("username"));
-//                savedInformation.add(restoredInformation.getString("password"));
-//                break;
-//            case 1:
-//                savedInformation.add(restoredInformation.getString("username"));
-//                savedInformation.add(restoredInformation.getString("name"));
-//                savedInformation.add(restoredInformation.getString("lastname"));
-//                savedInformation.add(restoredInformation.getString("password"));
-//                break;
-//        }
         swapMainFragment(currentFragmentMain);
     }
 
-
-    public void setInformation() {
-        if(restoreMode == 1){
-            switch(currentFragmentMain){
-                case 0:
-                    fragmentLogin.setEtUsername(savedInformation.remove(0));
-                    fragmentLogin.setEtPassword(savedInformation.remove(1));
-                    break;
-                case 1:
-                    fragmentSignup.setEtUsername(savedInformation.remove(0));
-                    fragmentSignup.setEtName(savedInformation.remove(1));
-                    fragmentSignup.setEtLastname(savedInformation.remove(2));
-                    fragmentSignup.setEtPassword(savedInformation.remove(3));
-                    break;
-            }
-
-            restoreMode = 0;
-        }
-
-    }
 
     public void updateBarCodeInformation(String id) {
         BarCode barcode = db.getBarCode(id);
@@ -499,10 +470,18 @@ public class Controller {
             case "Week":
                 fragmentSearch.setSpinner(2);
                 break;
-            case "Other":
+            case "Today":
                 fragmentSearch.setSpinner(3);
+                break;
+            case "Other":
+                fragmentSearch.setSpinner(4);
+                break;
 
         }
 
+    }
+
+    public void setFromFragment(){
+        this.fromFragment = "";
     }
 }
