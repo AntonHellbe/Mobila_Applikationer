@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -17,7 +18,8 @@ import android.widget.TextView;
 
 public class FragmentTransaction extends Fragment {
 
-    private TextView tvDisplayTitle, tvDisplayCategory, tvDisplayDate, tvDisplayAmount;
+    private TextView tvDisplayTitle, tvDisplayCategory, tvDisplayDate, tvDisplayAmount, tvDisplayType;
+    private Button btnReturn;
     private Controller controller;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -28,7 +30,7 @@ public class FragmentTransaction extends Fragment {
     }
 
     private void registerListeners(){
-
+        btnReturn.setOnClickListener(new ButtonListener());
     }
 
     @Override
@@ -42,6 +44,8 @@ public class FragmentTransaction extends Fragment {
         tvDisplayCategory = (TextView) rootView.findViewById(R.id.tvDisplayCategory);
         tvDisplayAmount = (TextView) rootView.findViewById(R.id.tvDisplayAmount);
         tvDisplayDate = (TextView) rootView.findViewById(R.id.tvDisplayDate);
+        tvDisplayType = (TextView) rootView.findViewById(R.id.tvDisplayType);
+        btnReturn = (Button) rootView.findViewById(R.id.btnReturn);
     }
 
 
@@ -63,7 +67,18 @@ public class FragmentTransaction extends Fragment {
         this.tvDisplayDate.setText(text);
     }
 
+    public void setTvDisplayType(String text){
+        this.tvDisplayType.setText(text);
+    }
     public void setController(Controller controller) {
         this.controller = controller;
+    }
+
+    private class ButtonListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            controller.moveBack(tvDisplayType.getText().toString());
+        }
     }
 }

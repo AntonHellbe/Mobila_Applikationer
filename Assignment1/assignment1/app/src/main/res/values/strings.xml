@@ -55,4 +55,6 @@
     <string name="newLastname">New Lastname</string>
     <string name="greeting">Here is a summary of your expenditures and income</string>
     <string name="tvBarcode">Press to scan barcode</string>
+    <string name="tvBarCodeInformation">Barcode id (Optional)</string>
+    <string name="date">Date</string>
 </resources>

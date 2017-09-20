@@ -30,7 +30,7 @@ public class FragmentSignup extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //controller.setInformation();
+        controller.restoreSignupInformation();
 
     }
 

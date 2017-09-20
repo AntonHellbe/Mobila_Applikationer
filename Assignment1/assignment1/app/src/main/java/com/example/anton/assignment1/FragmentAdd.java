@@ -80,6 +80,7 @@ public class FragmentAdd extends Fragment{
 
     private void registerListeners() {
         if(controller != null) {
+            //If statement needed because adding RadioGroupListener will fire when orientation changes and reference to controller is lost
             rgType.setOnCheckedChangeListener(new RadioGroupListener());
             btnDate.setOnClickListener(new ButtonListener());
             btnAdd.setOnClickListener(new ButtonListener());
@@ -130,10 +131,8 @@ public class FragmentAdd extends Fragment{
                     new DatePickerDialog(getActivity(), new DatePickerListener(), cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
                     break;
                 case R.id.btnAdd:
-                    String result = controller.addTransaction();
-                    Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
-                    controller.clearOptions();
-                    controller.moveBack(expense);
+                    Boolean result = controller.addTransaction();
+                    controller.finishTransaction(result);
             }
         }
     }

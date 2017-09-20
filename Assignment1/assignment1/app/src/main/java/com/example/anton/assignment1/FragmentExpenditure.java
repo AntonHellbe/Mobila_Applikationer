@@ -26,7 +26,7 @@ public class FragmentExpenditure extends Fragment {
 
     private Controller controller;
     private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView.Adapter transactionAdapter;
+    private TransactionAdapter transactionAdapter;
 
 
     @Nullable
@@ -53,6 +53,8 @@ public class FragmentExpenditure extends Fragment {
         fabAdd = (FloatingActionButton) rootView.findViewById(R.id.fabAddExpenditure);
         recyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getActivity());
+        transactionAdapter = new TransactionAdapter();
+        transactionAdapter.setController(controller);
         recyclerView.setLayoutManager(mLayoutManager);
     }
 
@@ -61,7 +63,7 @@ public class FragmentExpenditure extends Fragment {
     }
 
     public void setAdapter(ArrayList<Transaction> transactionArrayList){
-        transactionAdapter = new TransactionAdapter(transactionArrayList);
+        transactionAdapter.setTransactions(transactionArrayList);
         recyclerView.setAdapter(transactionAdapter);
     }
 

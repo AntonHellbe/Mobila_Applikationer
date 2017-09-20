@@ -24,8 +24,8 @@ public class FragmentIncome extends Fragment {
     private RecyclerView recyclerView;
     private Controller controller;
     private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView.Adapter transactionAdapter;
     private FloatingActionButton fabAdd;
+    private TransactionAdapter transactionAdapter;
 
     @Override
     public void onResume() {
@@ -51,6 +51,8 @@ public class FragmentIncome extends Fragment {
         fabAdd = (FloatingActionButton) rootView.findViewById(R.id.fabAdd);
         recyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(getActivity());
+        transactionAdapter = new TransactionAdapter();
+        transactionAdapter.setController(controller);
         recyclerView.setLayoutManager(mLayoutManager);
     }
     
@@ -59,7 +61,7 @@ public class FragmentIncome extends Fragment {
     }
 
     public void setAdapter(ArrayList<Transaction> transactionArrayList){
-        transactionAdapter = new TransactionAdapter(transactionArrayList);
+        transactionAdapter.setTransactions(transactionArrayList);
         recyclerView.setAdapter(transactionAdapter);
     }
 

@@ -22,14 +22,20 @@ import java.util.Observable;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
 
     private ArrayList<Transaction> transactions;
+    private Controller controller;
 
-    public TransactionAdapter(ArrayList<Transaction> transactions){
+    public TransactionAdapter(){
+
+    }
+
+    public void setTransactions(ArrayList<Transaction> transactions) {
         this.transactions = transactions;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         RecyclerView rv;
         TextView tvAmount, tvType, tvDate, tvCategory, tvId;
+        CardView cv;
         ImageView imIcon;
 
 
@@ -42,6 +48,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             tvCategory = (TextView) view.findViewById(R.id.tvCategory);
             tvId = (TextView) view.findViewById(R.id.tvIdentification);
             imIcon = (ImageView) view.findViewById(R.id.imIcon);
+            cv = (CardView) view.findViewById(R.id.cv);
 
         }
     }
@@ -60,6 +67,14 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         viewHolder.tvDate.setText(transactions.get(position).getDate());
         viewHolder.imIcon.setImageResource(setIcon(transactions.get(position).getCategory()));
         viewHolder.tvId.setText(String.valueOf(transactions.get(position).getId()));
+        final ViewHolder vh = viewHolder;
+        vh.cv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                controller.setTransactionId(vh.tvId.getText().toString());
+                controller.setFragmentTransaction();
+            }
+        });
     }
 
     @Override
@@ -83,6 +98,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 return R.drawable.food;
         }
         return 0;
+    }
+
+    public void setController(Controller controller){
+        this.controller = controller;
     }
 
 

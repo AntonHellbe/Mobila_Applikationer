@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.data.PieData;
 
@@ -43,8 +44,10 @@ public class Controller {
     private String customDateFrom = "";
     private String customDateTo = "";
     private int transactionId = 0;
+    private Transaction selectedTransaction;
 
-    private ArrayList<String> rescuedInformation = null;
+    private ArrayList<String> rescuedUserInformation = null;
+    private ArrayList<String> rescuedMainInformation = null;
 
 
     public Controller(MainActivity mainActivity){
@@ -115,6 +118,10 @@ public class Controller {
         return result;
     }
 
+    public int getCurrentFragment(){
+        return this.currentFragment;
+    }
+
     public boolean login(String username, String password) {
 
         User user = db.loginUser(username, password);
@@ -154,10 +161,10 @@ public class Controller {
     public void changeFragment(int position) {
         switch(position){
             case 0:
-                userActivity.setFragment(fragmentMain, true);
+                userActivity.setFragment(fragmentMain, false);
                 break;
             case 1:
-                userActivity.setFragment(fragmentUser, true);
+                userActivity.setFragment(fragmentUser, false);
                 break;
             case 2:
                 userActivity.setFragment(fragmentIncome, true);
@@ -166,7 +173,7 @@ public class Controller {
                 userActivity.setFragment(fragmentExpenditure, true);
                 break;
             case 4:
-                userActivity.setFragment(fragmentSearch, true);
+                userActivity.setFragment(fragmentSearch, false);
                 break;
             case 5:
                 userActivity.startBarCodeActivity();
@@ -174,9 +181,11 @@ public class Controller {
             case 6:
                 userActivity.setFragment(fragmentAdd, true);
                 break;
+            case 7:
+                userActivity.setFragment(fragmentTransaction, true);
+                break;
         }
         currentFragment = position;
-        //fromFragment = "";
     }
 
     public void addChartData(Boolean state) {
@@ -205,6 +214,17 @@ public class Controller {
         changeFragment(currentFragment);
     }
 
+    public void setFragmentTransaction(){
+        if(currentFragment == 3){
+            fromFragment = "Expenditure";
+        }else{
+            fromFragment = "Income";
+        }
+
+        currentFragment = 7;
+        changeFragment(currentFragment);
+    }
+
 
 
     public void setTransactionAdapter() {
@@ -218,7 +238,7 @@ public class Controller {
 
         if (currentFragment == 3) {
             fragmentExpenditure.setAdapter(db.getExpenditureRange(dateSelected));
-        } else {
+        }else if(currentFragment == 2){
             fragmentIncome.setAdapter(db.getIncomeRange(dateSelected));
         }
 
@@ -298,17 +318,18 @@ public class Controller {
         outState.putInt("currentFragment", currentFragment);
         outState.putBoolean("piechart", fragmentMain.getState());
         outState.putParcelable("currentUser", currentUser);
+        outState.putParcelable("selectedTransaction", selectedTransaction);
+        outState.putInt("transactionId", transactionId);
+        outState.putString("dateSelected", dateSelected);
+
         if(dateSelected.equals("Other")){
-            outState.putString("dateSelected", dateSelected);
+
+        }
             outState.putString("customDateFrom", customDateFrom);
             outState.putString("customDateTo", customDateTo);
-        }else{
-            outState.putString("dateSelected", dateSelected);
-        }
 
         if(currentFragment == 6){
             outState.putInt("rbChecked", fragmentAdd.getCheckId());
-            outState.putString("categories", fragmentAdd.getsCategory());
             outState.putString("title", fragmentAdd.getEtTitle());
             outState.putString("amount", fragmentAdd.getEtAmount());
             outState.putString("date", fragmentAdd.getBtnDate());
@@ -326,6 +347,8 @@ public class Controller {
         changeFragment(savedInstanceState.getInt("currentFragment"));
         dateSelected = savedInstanceState.getString("dateSelected");
         informationSaved = savedInstanceState.getBoolean("savedInformation");
+        selectedTransaction = savedInstanceState.getParcelable("selectedTransaction");
+        transactionId = savedInstanceState.getInt("transactionId");
 
         if(dateSelected.equals("Other")){
             customDateFrom = savedInstanceState.getString("customDateFrom");
@@ -333,13 +356,12 @@ public class Controller {
         }
 
         if(informationSaved){
-            rescuedInformation = new ArrayList<>();
-            rescuedInformation.add(Integer.toString(savedInstanceState.getInt("rbChecked")));
-            rescuedInformation.add(savedInstanceState.getString("categories"));
-            rescuedInformation.add(savedInstanceState.getString("title"));
-            rescuedInformation.add(savedInstanceState.getString("amount"));
-            rescuedInformation.add(savedInstanceState.getString("date"));
-            rescuedInformation.add(savedInstanceState.getString("barcodeid"));
+            rescuedUserInformation = new ArrayList<>();
+            rescuedUserInformation.add(Integer.toString(savedInstanceState.getInt("rbChecked")));
+            rescuedUserInformation.add(savedInstanceState.getString("title"));
+            rescuedUserInformation.add(savedInstanceState.getString("amount"));
+            rescuedUserInformation.add(savedInstanceState.getString("date"));
+            rescuedUserInformation.add(savedInstanceState.getString("barcodeid"));
         }
         informationSaved = false;
 
@@ -357,38 +379,39 @@ public class Controller {
     }
 
 
-    public String addTransaction() {
-        if(fragmentAdd.getExpense().equals("") || fragmentAdd.getEtTitle().equals("") || currentUser.getUsername().equals("") ||
-                fragmentAdd.getEtAmount().equals("") || fragmentAdd.getsCategory().equals("") || fragmentAdd.getBtnDate().equals("")){
-            return "Not all fields filled in";
+    public Boolean addTransaction() {
+        if(fragmentAdd.getExpense().equals("") || fragmentAdd.getEtTitle().equals("") ||
+                fragmentAdd.getEtAmount().equals("") || fragmentAdd.getsCategory().equals("") || fragmentAdd.getBtnDate().equals("YYYY-MM-DD")){
+            return false;
         }
+
         try{
             Transaction trans = new Transaction(fragmentAdd.getExpense(), fragmentAdd.getEtTitle(), currentUser.getUsername(),
                     parseFloat(fragmentAdd.getEtAmount()), fragmentAdd.getsCategory(), fragmentAdd.getBtnDate());
             db.addTransaction(trans);
         }catch(Exception e){
-            return "Something went wrong!";
+            return false;
         }
 
         if(!fragmentAdd.getEtBarCodeIt().equals("Press to scan barcode")){
             BarCode barCode = new BarCode(fragmentAdd.getEtBarCodeIt(), fragmentAdd.getEtTitle(), fragmentAdd.getsCategory(), parseFloat(fragmentAdd.getEtAmount()));
             if(db.addBarCode(barCode)){
-                Log.e("BarCode", "Barcode added successfully");
+
             }
         }
 
-        return "Transaction added";
+        return true;
     }
 
     public void moveBack(String expense) {
         switch(expense){
             case "Income":
                 currentFragment = 2;
-                changeFragment(currentFragment);
+                userActivity.setFragment(fragmentIncome, false);
                 break;
             case "Expenditure":
                 currentFragment = 3;
-                changeFragment(currentFragment);
+                userActivity.setFragment(fragmentExpenditure, false);
                 break;
         }
     }
@@ -432,15 +455,16 @@ public class Controller {
     public void swapMainFragment(int pos){
         switch(pos){
             case 0:
-                mainActivity.setFragment(fragmentLogin, true);
                 currentFragmentMain = pos;
+                mainActivity.setFragment(fragmentLogin, true);
                 break;
             case 1:
-                mainActivity.setFragment(fragmentSignup, true);
                 currentFragmentMain = pos;
+                mainActivity.setFragment(fragmentSignup, true);
                 break;
         }
     }
+
 
 
     public void createUser(Intent intent) {
@@ -466,12 +490,41 @@ public class Controller {
     }
 
     public Bundle saveInformationMainActivity(Bundle outState) {
+        Log.e("currentFragmentMain", currentFragmentMain + "");
         outState.putInt("currentFragmentMain", currentFragmentMain);
+        informationSaved = true;
+        outState.putBoolean("savedInformation", informationSaved);
+        switch(currentFragmentMain){
+            case 0:
+                outState.putString("username", fragmentLogin.getEtUsername());
+                outState.putString("password", fragmentLogin.getEtPassword());
+                break;
+            case 1:
+                outState.putString("username", fragmentSignup.getUsername());
+                outState.putString("name", fragmentSignup.getName());
+                outState.putString("lastname", fragmentSignup.getLastName());
+                outState.putString("password", fragmentSignup.getPassword());
+                break;
+        }
         return outState;
     }
 
     public void setRestoredInformation(Bundle restoredInformation) {
         currentFragmentMain = restoredInformation.getInt("currentFragmentMain");
+        informationSaved = restoredInformation.getBoolean("savedInformation");
+        rescuedMainInformation = new ArrayList<>();
+        switch(currentFragmentMain){
+            case 0:
+                rescuedMainInformation.add(restoredInformation.getString("username"));
+                rescuedMainInformation.add(restoredInformation.getString("password"));
+                break;
+            case 1:
+                rescuedMainInformation.add(restoredInformation.getString("username"));
+                rescuedMainInformation.add(restoredInformation.getString("name"));
+                rescuedMainInformation.add(restoredInformation.getString("lastname"));
+                rescuedMainInformation.add(restoredInformation.getString("password"));
+                break;
+        }
         swapMainFragment(currentFragmentMain);
     }
 
@@ -556,19 +609,58 @@ public class Controller {
     }
 
     public void possibleRescueMission() {
-        if(rescuedInformation != null){
-            fragmentAdd.setRgType(Integer.parseInt(rescuedInformation.get(0)));;
-            fragmentAdd.setEtTitle(rescuedInformation.get(2));
-            fragmentAdd.setEtAmount(rescuedInformation.get(3));
-            fragmentAdd.setBtnDate(rescuedInformation.get(4));
-            fragmentAdd.setEtBarCodeId(rescuedInformation.get(5));
-            rescuedInformation = null;
+        if(rescuedUserInformation != null){
+            fragmentAdd.setRgType(Integer.parseInt(rescuedUserInformation.get(0)));;
+            fragmentAdd.setEtTitle(rescuedUserInformation.get(1));
+            fragmentAdd.setEtAmount(rescuedUserInformation.get(2));
+            fragmentAdd.setBtnDate(rescuedUserInformation.get(3));
+            fragmentAdd.setEtBarCodeId(rescuedUserInformation.get(4));
+            rescuedUserInformation = null;
         }
 
     }
 
+    public void setTransactionId(String id){
+        this.transactionId = Integer.parseInt(id);
+        this.selectedTransaction = db.getTransaction(transactionId);
+    }
+
     public void setTransactionInformation() {
-        Transaction trans = db.getTransaction(transactionId);
+        fragmentTransaction.setTvDisplayTitle(selectedTransaction.getTitle());
+        fragmentTransaction.setTvDisplayType(selectedTransaction.getType());
+        fragmentTransaction.setTvDisplayCategory(selectedTransaction.getCategory());
+        fragmentTransaction.setTvDisplayAmount(String.valueOf(selectedTransaction.getAmount()));
+        fragmentTransaction.setTvDisplayDate(selectedTransaction.getDate());
+    }
+
+    public void restoreLoginInformation() {
+        if(informationSaved){
+            fragmentLogin.setEtUsername(rescuedMainInformation.get(0));
+            fragmentLogin.setEtPassword(rescuedMainInformation.get(1));
+            informationSaved = false;
+            rescuedMainInformation = null;
+        }
+
+    }
+
+    public void restoreSignupInformation() {
+        if(informationSaved){
+            fragmentSignup.setEtUsername(rescuedMainInformation.get(0));
+            fragmentSignup.setEtName(rescuedMainInformation.get(1));
+            fragmentSignup.setEtLastname(rescuedMainInformation.get(2));
+            fragmentSignup.setEtPassword(rescuedMainInformation.get(3));
+            informationSaved = false;
+            rescuedMainInformation = null;
+        }
+    }
+
+    public void finishTransaction(Boolean result) {
+        if(result){
+            moveBack(fragmentAdd.getExpense());
+            clearOptions();
+        }else{
+            Toast.makeText(userActivity, "One or more fields missing!", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 

@@ -1,12 +1,14 @@
 package com.example.anton.assignment1;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 /**
  * Created by Anton on 2017-09-13.
  */
 
-class Transaction {
+class Transaction implements Parcelable {
     private int id;
     private String title;
     private String type;
@@ -35,6 +37,17 @@ class Transaction {
         this.date = date;
 
     }
+
+    protected Transaction(Parcel in) {
+        id = in.readInt();
+        title = in.readString();
+        type = in.readString();
+        userid = in.readString();
+        amount = in.readFloat();
+        category = in.readString();
+        date = in.readString();
+    }
+
 
     public float getAmount() {
         return amount;
@@ -95,4 +108,33 @@ class Transaction {
     public void setId(int id) {
         this.id = id;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeString(type);
+        dest.writeString(userid);
+        dest.writeFloat(amount);
+        dest.writeString(category);
+        dest.writeString(date);
+    }
+
+    public static Creator<Transaction> CREATOR = new Creator<Transaction>() {
+
+        @Override
+        public Transaction createFromParcel(Parcel parcel) {
+            return new Transaction(parcel.readInt(), parcel.readString(), parcel.readString(), parcel.readString(), parcel.readFloat(), parcel.readString(), parcel.readString());
+        }
+
+        @Override
+        public Transaction[] newArray(int size) {
+            return new Transaction[size];
+        }
+    };
 }

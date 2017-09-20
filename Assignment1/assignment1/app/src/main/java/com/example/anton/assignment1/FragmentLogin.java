@@ -36,6 +36,7 @@ public class FragmentLogin extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        controller.restoreLoginInformation();
         //controller.setInformation();
     }
 

@@ -260,10 +260,10 @@ public class DatabaseIF {
     public User loginUser(String username, String password){
         SQLiteDatabase db = userDBHelper.getWritableDatabase();
 
-//        SQLiteDatabase db2 = barCodeDBHelper.getWritableDatabase();
-//        SQLiteDatabase db3 = transactionDBHelper.getWritableDatabase();
-//        transactionDBHelper.onUpgrade(db3, 1, 2);
-//        barCodeDBHelper.onUpgrade(db2, 1, 2);
+        SQLiteDatabase db2 = barCodeDBHelper.getWritableDatabase();
+        SQLiteDatabase db3 = transactionDBHelper.getWritableDatabase();
+        transactionDBHelper.onUpgrade(db3, 1, 2);
+        barCodeDBHelper.onUpgrade(db2, 1, 2);
 
         int idIndex, useridIndex, nameIndex, lastnameIndex, passwordIndex;
 

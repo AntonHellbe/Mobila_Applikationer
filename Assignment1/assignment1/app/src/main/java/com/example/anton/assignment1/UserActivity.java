@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 /**
  * Created by Anton on 2017-09-12.
@@ -83,21 +84,24 @@ public class UserActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //Log.v()
 
         if(resultCode == RESULT_OK){
             controller.updateBarCodeInformation(data);
             controller.setAddFragment();
 
         }else{
-            controller.changeFragment(0);
+            controller.changeFragment(controller.getCurrentFragment());
         }
     }
 
     public void startBarCodeActivity() {
         Intent intent = new Intent("com.google.zxing.client.android.SCAN");
         intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
-        startActivityForResult(intent, 0);
+        try{
+            startActivityForResult(intent, 0);
+        }catch(Exception e){
+            Toast.makeText(this, "Barcode app not installed or not available", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private class ListViewListener implements AdapterView.OnItemClickListener{
