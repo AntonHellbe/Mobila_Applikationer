@@ -78,16 +78,6 @@ public class FragmentAdd extends Fragment{
     }
 
 
-    private void registerListeners() {
-        if(controller != null) {
-            //If statement needed because adding RadioGroupListener will fire when orientation changes and reference to controller is lost
-            rgType.setOnCheckedChangeListener(new RadioGroupListener());
-            btnDate.setOnClickListener(new ButtonListener());
-            btnAdd.setOnClickListener(new ButtonListener());
-            etBarCodeId.setOnClickListener(new BarCodeScanner());
-        }
-    }
-
     public void setSpinnerAdapter(int spinnerAdapter) {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 spinnerAdapter, android.R.layout.simple_spinner_item);
@@ -111,11 +101,11 @@ public class FragmentAdd extends Fragment{
             switch(i){
                 case R.id.rbExpend:
                     controller.changeSpinner(0);
-                    expense = rbExpense.getText().toString();
+                    expense = "Expenditure";
                     break;
                 case R.id.rbInc:
                     controller.changeSpinner(1);
-                    expense = rbIncome.getText().toString();
+                    expense = "Income";
                     break;
                 }
         }
@@ -201,6 +191,10 @@ public class FragmentAdd extends Fragment{
         return sCategory.getSelectedItem().toString();
     }
 
+    public Object getsCategoryObject(){
+        return sCategory.getSelectedItem();
+    }
+
     public void setExpense(String text){
         this.expense = text;
     }
@@ -219,6 +213,16 @@ public class FragmentAdd extends Fragment{
 
     public int getCheckId(){
         return rgType.getCheckedRadioButtonId();
+    }
+
+    private void registerListeners() {
+        if(controller != null) {
+            //If statement needed because adding RadioGroupListener will fire when orientation changes and reference to controller is lost
+            rgType.setOnCheckedChangeListener(new RadioGroupListener());
+            btnDate.setOnClickListener(new ButtonListener());
+            btnAdd.setOnClickListener(new ButtonListener());
+            etBarCodeId.setOnClickListener(new BarCodeScanner());
+        }
     }
 
 }

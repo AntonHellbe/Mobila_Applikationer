@@ -71,11 +71,12 @@ public class PieChartHandler {
 
         PieDataSet pieSet = new PieDataSet(pieEntries1, "Expenditure");
         ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(Color.GREEN);
+        colors.add(Color.YELLOW);
         colors.add(Color.BLUE);
-        colors.add(Color.RED);
         colors.add(Color.MAGENTA);
         colors.add(Color.CYAN);
+        colors.add(Color.GRAY);
+        colors.add(Color.RED);
 
         pieSet.setColors(colors);
 
@@ -114,8 +115,8 @@ public class PieChartHandler {
         PieDataSet pieSet = new PieDataSet(pieEntries, "Income");
 
         ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(Color.GREEN);
-        colors.add(Color.BLUE);
+        colors.add(Color.YELLOW);
+        colors.add(Color.CYAN);
 
         pieSet.setColors(colors);
 

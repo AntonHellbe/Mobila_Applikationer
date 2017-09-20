@@ -49,8 +49,6 @@ public class FragmentTransaction extends Fragment {
     }
 
 
-
-
     public void setTvDisplayTitle(String text) {
         this.tvDisplayTitle.setText(text);
     }

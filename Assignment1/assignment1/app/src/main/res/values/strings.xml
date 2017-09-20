@@ -57,4 +57,9 @@
     <string name="tvBarcode">Press to scan barcode</string>
     <string name="tvBarCodeInformation">Barcode id (Optional)</string>
     <string name="date">Date</string>
+    <string name="expBalance">Expenditure Balance</string>
+    <string name="incBalance">Income Balance</string>
+    <string name="transDetails">Transaction Details</string>
+    <string name="type">Type</string>
+    <string name="category">Category</string>
 </resources>

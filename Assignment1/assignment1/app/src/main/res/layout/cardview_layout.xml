@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/cv"
+    android:elevation="6dp"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
@@ -36,8 +37,6 @@
             android:layout_weight="0.6"
             android:orientation="vertical"
             >
-
-
             <TextView
                 android:id="@+id/tvDate"
                 android:layout_width="match_parent"

@@ -103,7 +103,7 @@ public class DatabaseIF {
         }
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_TYPE + " = ?" + " AND " + TransactionDBHelper.COLUMN_USERID + " = ?" + " AND "
-                +   "? >= " + TransactionDBHelper.COLUMN_DATE + " AND " + "? <= " + TransactionDBHelper.COLUMN_DATE, new String[]{"Income", controller.getCurrentUserName(), fromDate, toDate});
+                +  TransactionDBHelper.COLUMN_DATE + " between" + " ? " + "AND" + " ? ", new String[]{"Income", controller.getCurrentUserName(), toDate, fromDate});
         ArrayList<Transaction> transactions = new ArrayList<Transaction>();
         idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
         titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
@@ -154,7 +154,7 @@ public class DatabaseIF {
 
         SQLiteDatabase db = transactionDBHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_TYPE + " = ?" + " AND " + TransactionDBHelper.COLUMN_USERID + " = ?" + " AND "
-                +   "? >= " + TransactionDBHelper.COLUMN_DATE + " AND " + "? <= " + TransactionDBHelper.COLUMN_DATE, new String[]{"Expenditure", controller.getCurrentUserName(), fromDate, toDate});
+                +  TransactionDBHelper.COLUMN_DATE + " between" + " ? " + "AND" + " ? " , new String[]{"Expenditure", controller.getCurrentUserName(), toDate, fromDate});
         ArrayList<Transaction> transactions = new ArrayList<Transaction>();
         idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
         titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);

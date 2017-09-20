@@ -75,6 +75,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 controller.setFragmentTransaction();
             }
         });
+
     }
 
     @Override

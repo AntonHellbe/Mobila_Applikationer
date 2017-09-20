@@ -30,7 +30,8 @@ import java.util.ArrayList;
 public class FragmentMain extends Fragment {
 
     private Controller controller;
-    private TextView tvUsername, tvDisplayInformation;
+    private TextView tvUsername, tvBalanceIncome, tvBalanceExpenditure;
+    private CustomTextView customTextView;
     private PieChart pieChart;
     private ToggleButton tbBtn;
     private Boolean state = false;
@@ -48,7 +49,9 @@ public class FragmentMain extends Fragment {
 
     private void initializeComponents(View rootView) {
         tvUsername = (TextView) rootView.findViewById(R.id.tvDisplayUsername);
-        tvDisplayInformation = (TextView) rootView.findViewById(R.id.tvDisplayInformation);
+        tvBalanceIncome = (TextView) rootView.findViewById(R.id.tvBalanceIncome);
+        tvBalanceExpenditure = (TextView) rootView.findViewById(R.id.tvBalanceExpenditure);
+        customTextView = (CustomTextView) rootView.findViewById(R.id.tvTotalBalance);
         tbBtn = (ToggleButton) rootView.findViewById(R.id.tbPieChart);
         pieChart = (PieChart) rootView.findViewById(R.id.pcExpenditure);
         pieChart.setHoleRadius(30);
@@ -114,8 +117,17 @@ public class FragmentMain extends Fragment {
         this.state = state;
     }
 
-    public void setTvDisplayInformation(String text){
-        this.tvDisplayInformation.setText(text);
+
+    public void setTvBalanceIncome(String text){
+        this.tvBalanceIncome.setText(text);
+    }
+
+    public void setTvBalanceExpenditure(String text){
+        this.tvBalanceExpenditure.setText(text);
+    }
+
+    public void setTotalBalance(String text){
+        this.customTextView.setText(text);
     }
 
 }

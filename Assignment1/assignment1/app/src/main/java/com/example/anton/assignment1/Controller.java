@@ -45,6 +45,8 @@ public class Controller {
     private String customDateTo = "";
     private int transactionId = 0;
     private Transaction selectedTransaction;
+    private float incomeBalance = 0;
+    private float expenditureBalance = 0;
 
     private ArrayList<String> rescuedUserInformation = null;
     private ArrayList<String> rescuedMainInformation = null;
@@ -159,12 +161,12 @@ public class Controller {
 
 
     public void changeFragment(int position) {
-        switch(position){
+        switch (position) {
             case 0:
-                userActivity.setFragment(fragmentMain, false);
+                userActivity.setFragment(fragmentMain, true);
                 break;
             case 1:
-                userActivity.setFragment(fragmentUser, false);
+                userActivity.setFragment(fragmentUser, true);
                 break;
             case 2:
                 userActivity.setFragment(fragmentIncome, true);
@@ -173,7 +175,7 @@ public class Controller {
                 userActivity.setFragment(fragmentExpenditure, true);
                 break;
             case 4:
-                userActivity.setFragment(fragmentSearch, false);
+                userActivity.setFragment(fragmentSearch, true);
                 break;
             case 5:
                 userActivity.startBarCodeActivity();
@@ -185,6 +187,7 @@ public class Controller {
                 userActivity.setFragment(fragmentTransaction, true);
                 break;
         }
+
         currentFragment = position;
     }
 
@@ -198,6 +201,21 @@ public class Controller {
             pieData = pieChartHandler.mapIncome(db.getIncomeRange(dateSelected));
         }
             fragmentMain.setTbOff(toggleStates[0]);
+
+
+        ArrayList<Transaction> trans = db.getAllTransactions(currentUser.getUsername());
+        for(Transaction tran: trans){
+            if(tran.getType().equals("Income")){
+                incomeBalance += tran.getAmount();
+            }else{
+                expenditureBalance -= tran.getAmount();
+            }
+        }
+        fragmentMain.setTvBalanceExpenditure(String.valueOf(expenditureBalance));
+        fragmentMain.setTvBalanceIncome(String.valueOf(incomeBalance));
+        fragmentMain.setTotalBalance(String.valueOf(incomeBalance + expenditureBalance));
+        incomeBalance = 0;
+        expenditureBalance = 0;
 
         pieData.setValueTextSize(10f);
         fragmentMain.setPieChartData(pieData);
@@ -321,12 +339,8 @@ public class Controller {
         outState.putParcelable("selectedTransaction", selectedTransaction);
         outState.putInt("transactionId", transactionId);
         outState.putString("dateSelected", dateSelected);
-
-        if(dateSelected.equals("Other")){
-
-        }
-            outState.putString("customDateFrom", customDateFrom);
-            outState.putString("customDateTo", customDateTo);
+        outState.putString("customDateFrom", customDateFrom);
+        outState.putString("customDateTo", customDateTo);
 
         if(currentFragment == 6){
             outState.putInt("rbChecked", fragmentAdd.getCheckId());
@@ -335,6 +349,11 @@ public class Controller {
             outState.putString("date", fragmentAdd.getBtnDate());
             outState.putString("barcodeid", fragmentAdd.getEtBarCodeIt());
             outState.putBoolean("savedInformation", informationSaved = true);
+            if(fragmentAdd.getsCategoryObject() != null){
+                outState.putString("category", fragmentAdd.getsCategory());
+            }else{
+                outState.putString("category", "null");
+            }
 
         }
 
@@ -362,6 +381,41 @@ public class Controller {
             rescuedUserInformation.add(savedInstanceState.getString("amount"));
             rescuedUserInformation.add(savedInstanceState.getString("date"));
             rescuedUserInformation.add(savedInstanceState.getString("barcodeid"));
+            if(!savedInstanceState.getString("category").equals("null")){
+                switch(Integer.parseInt(rescuedUserInformation.get(0))){
+                    case R.id.rbInc:
+                        switch (savedInstanceState.getString("category")){
+                            case "Salary":
+                                rescuedUserInformation.add(String.valueOf(0));
+                                break;
+                            case "Other":
+                                rescuedUserInformation.add(String.valueOf(1));
+                                break;
+                        }
+                        break;
+                    case R.id.rbExpend:
+                        switch (savedInstanceState.getString("category")){
+                            case "Travel":
+                                rescuedUserInformation.add(String.valueOf(0));
+                                break;
+                            case "Leisure":
+                                rescuedUserInformation.add(String.valueOf(1));
+                                break;
+                            case "Food":
+                                rescuedUserInformation.add(String.valueOf(2));
+                                break;
+                            case "Other":
+                                rescuedUserInformation.add(String.valueOf(3));
+                                break;
+                            case "Accommodation":
+                                rescuedUserInformation.add(String.valueOf(4));
+                                break;
+                        }
+                        break;
+                }
+            }else{
+                rescuedUserInformation.add("null");
+            }
         }
         informationSaved = false;
 
@@ -407,11 +461,11 @@ public class Controller {
         switch(expense){
             case "Income":
                 currentFragment = 2;
-                userActivity.setFragment(fragmentIncome, false);
+                userActivity.setFragment(fragmentIncome, true);
                 break;
             case "Expenditure":
                 currentFragment = 3;
-                userActivity.setFragment(fragmentExpenditure, false);
+                userActivity.setFragment(fragmentExpenditure, true);
                 break;
         }
     }
@@ -615,6 +669,9 @@ public class Controller {
             fragmentAdd.setEtAmount(rescuedUserInformation.get(2));
             fragmentAdd.setBtnDate(rescuedUserInformation.get(3));
             fragmentAdd.setEtBarCodeId(rescuedUserInformation.get(4));
+            if(!rescuedUserInformation.get(5).equals("null")){
+                fragmentAdd.setsCategory(Integer.parseInt(rescuedUserInformation.get(5)));
+            }
             rescuedUserInformation = null;
         }
 
@@ -626,6 +683,7 @@ public class Controller {
     }
 
     public void setTransactionInformation() {
+
         fragmentTransaction.setTvDisplayTitle(selectedTransaction.getTitle());
         fragmentTransaction.setTvDisplayType(selectedTransaction.getType());
         fragmentTransaction.setTvDisplayCategory(selectedTransaction.getCategory());
@@ -634,6 +692,7 @@ public class Controller {
     }
 
     public void restoreLoginInformation() {
+
         if(informationSaved){
             fragmentLogin.setEtUsername(rescuedMainInformation.get(0));
             fragmentLogin.setEtPassword(rescuedMainInformation.get(1));
@@ -656,6 +715,7 @@ public class Controller {
 
     public void finishTransaction(Boolean result) {
         if(result){
+            Toast.makeText(userActivity, "Transaction added!", Toast.LENGTH_SHORT).show();
             moveBack(fragmentAdd.getExpense());
             clearOptions();
         }else{

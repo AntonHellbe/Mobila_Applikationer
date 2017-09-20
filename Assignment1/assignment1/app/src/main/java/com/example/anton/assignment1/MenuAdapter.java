@@ -20,12 +20,15 @@ public class MenuAdapter extends ArrayAdapter<String> {
 
     private LayoutInflater layoutInflater;
     private final Integer[] imgId;
+    private String[] object;
 
     public MenuAdapter(@NonNull Context context, @NonNull String[] objects, Integer[] imgId) {
         super(context, R.layout.row_layout, objects);
         layoutInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         this.imgId = imgId;
     }
+
+
 
     @NonNull
     @Override

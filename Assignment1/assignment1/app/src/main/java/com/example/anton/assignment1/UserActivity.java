@@ -3,6 +3,7 @@ package com.example.anton.assignment1;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -112,6 +113,17 @@ public class UserActivity extends AppCompatActivity {
             controller.setFromFragment();
             drawerLayout.closeDrawers();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawers();
+        }else{
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }
+
     }
 
     public void setFragment(Fragment fragment, boolean backstack){
