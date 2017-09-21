@@ -37,7 +37,6 @@ public class FragmentLogin extends Fragment {
     public void onResume() {
         super.onResume();
         controller.restoreLoginInformation();
-        //controller.setInformation();
     }
 
     private void initializeComponents(View rootView) {
@@ -52,12 +51,13 @@ public class FragmentLogin extends Fragment {
     }
 
     private class ButtonChoiceListener implements View.OnClickListener {
-        String result = "";
+
+
         @Override
         public void onClick(View v) {
             switch(v.getId()){
                 case R.id.btnLogin:
-                    if(controller.login(etUsername.getText().toString(), etPassword.getText().toString())){
+                    if(controller.login()){
                         controller.startUserActivity();
                     }else{
                         Toast.makeText(getActivity(), "Username or password wrong", Toast.LENGTH_SHORT).show();

@@ -115,7 +115,7 @@ public class PieChartHandler {
         PieDataSet pieSet = new PieDataSet(pieEntries, "Income");
 
         ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(Color.YELLOW);
+        colors.add(Color.MAGENTA);
         colors.add(Color.CYAN);
 
         pieSet.setColors(colors);

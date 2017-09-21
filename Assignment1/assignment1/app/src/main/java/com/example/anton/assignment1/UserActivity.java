@@ -63,10 +63,7 @@ public class UserActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.drawer_close, R.string.drawer_open);
-        //drawerLayout.setDrawerListener(toggle);
         toggle.syncState();
-
-
 
 
     }
@@ -100,8 +97,9 @@ public class UserActivity extends AppCompatActivity {
         intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
         try{
             startActivityForResult(intent, 0);
+
         }catch(Exception e){
-            Toast.makeText(this, "Barcode app not installed or not available", Toast.LENGTH_SHORT).show();
+
         }
     }
 
@@ -136,8 +134,6 @@ public class UserActivity extends AppCompatActivity {
         }
         ft.commit();
     }
-
-
 
 
 }

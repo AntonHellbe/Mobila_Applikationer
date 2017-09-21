@@ -124,9 +124,9 @@ public class Controller {
         return this.currentFragment;
     }
 
-    public boolean login(String username, String password) {
+    public boolean login() {
 
-        User user = db.loginUser(username, password);
+        User user = db.loginUser(fragmentLogin.getEtUsername(), fragmentLogin.getEtPassword());
 
         if(user != null){
             currentUser = user;
@@ -197,11 +197,9 @@ public class Controller {
             pieData = pieChartHandler.mapExpenditure(db.getExpenditureRange(dateSelected));
             fragmentMain.setTbOn(toggleStates[1]);
         }else{
-
             pieData = pieChartHandler.mapIncome(db.getIncomeRange(dateSelected));
-        }
             fragmentMain.setTbOff(toggleStates[0]);
-
+        }
 
         ArrayList<Transaction> trans = db.getAllTransactions(currentUser.getUsername());
         for(Transaction tran: trans){
@@ -281,16 +279,16 @@ public class Controller {
     public void setTvDatesSelected(){
         switch(dateSelected){
             case "Year":
-                fragmentSearch.setTvFromDate("From: " + getCalculatedDate(0));
-                fragmentSearch.setTvToDate("To: " + getCalculatedDate(-365));
+                fragmentSearch.setTvFromDate("From: " + getCalculatedDate(-365));
+                fragmentSearch.setTvToDate("To: " + getCalculatedDate(0));
                 break;
             case "Month":
-                fragmentSearch.setTvFromDate("From: " + getCalculatedDate(0));
-                fragmentSearch.setTvToDate("To: " + getCalculatedDate(-31));
+                fragmentSearch.setTvFromDate("From: " + getCalculatedDate(-31));
+                fragmentSearch.setTvToDate("To: " + getCalculatedDate(0));
                 break;
             case "Week":
-                fragmentSearch.setTvFromDate("From: " + getCalculatedDate(0));
-                fragmentSearch.setTvToDate("To: " + getCalculatedDate(-7));
+                fragmentSearch.setTvFromDate("From: " + getCalculatedDate(-7));
+                fragmentSearch.setTvToDate("To: " + getCalculatedDate(0));
                 break;
             case "Today":
                 fragmentSearch.setTvFromDate("From: " + getCalculatedDate(0));
@@ -689,6 +687,7 @@ public class Controller {
         fragmentTransaction.setTvDisplayCategory(selectedTransaction.getCategory());
         fragmentTransaction.setTvDisplayAmount(String.valueOf(selectedTransaction.getAmount()));
         fragmentTransaction.setTvDisplayDate(selectedTransaction.getDate());
+        fragmentTransaction.setTvHidden(String.valueOf(selectedTransaction.getId()));
     }
 
     public void restoreLoginInformation() {
@@ -720,6 +719,17 @@ public class Controller {
             clearOptions();
         }else{
             Toast.makeText(userActivity, "One or more fields missing!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void deleteTransaction() {
+        Boolean successDeletion = db.deleteTransaction(Integer.parseInt(fragmentTransaction.getTvHidden()));
+
+        if(successDeletion){
+            Toast.makeText(userActivity, "Transaction Removed!", Toast.LENGTH_SHORT).show();
+            moveBack(fragmentTransaction.getTvDisplayType());
+        }else{
+            Toast.makeText(userActivity, "Something went wrong!", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -18,8 +18,8 @@ import android.widget.TextView;
 
 public class FragmentTransaction extends Fragment {
 
-    private TextView tvDisplayTitle, tvDisplayCategory, tvDisplayDate, tvDisplayAmount, tvDisplayType;
-    private Button btnReturn;
+    private TextView tvDisplayTitle, tvDisplayCategory, tvDisplayDate, tvDisplayAmount, tvDisplayType, tvHiddenId;
+    private Button btnReturn, btnDelete;
     private Controller controller;
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -31,6 +31,7 @@ public class FragmentTransaction extends Fragment {
 
     private void registerListeners(){
         btnReturn.setOnClickListener(new ButtonListener());
+        btnDelete.setOnClickListener(new ButtonListener());
     }
 
     @Override
@@ -45,7 +46,9 @@ public class FragmentTransaction extends Fragment {
         tvDisplayAmount = (TextView) rootView.findViewById(R.id.tvDisplayAmount);
         tvDisplayDate = (TextView) rootView.findViewById(R.id.tvDisplayDate);
         tvDisplayType = (TextView) rootView.findViewById(R.id.tvDisplayType);
+        tvHiddenId = (TextView) rootView.findViewById(R.id.tvHiddenId);
         btnReturn = (Button) rootView.findViewById(R.id.btnReturn);
+        btnDelete = (Button) rootView.findViewById(R.id.btnDelete);
     }
 
 
@@ -72,11 +75,31 @@ public class FragmentTransaction extends Fragment {
         this.controller = controller;
     }
 
+    public void setTvHidden(String text){
+        this.tvHiddenId.setText(text);
+    }
+
+    public String getTvDisplayType(){
+        return this.tvDisplayType.getText().toString();
+    }
+
+    public String getTvHidden(){
+        return this.tvHiddenId.getText().toString();
+    }
+
     private class ButtonListener implements View.OnClickListener{
 
         @Override
         public void onClick(View v) {
-            controller.moveBack(tvDisplayType.getText().toString());
+            switch(v.getId()){
+                case R.id.btnReturn:
+                    controller.moveBack(tvDisplayType.getText().toString());
+                    break;
+                case R.id.btnDelete:
+                    controller.deleteTransaction();
+                    break;
+            }
+
         }
     }
 }

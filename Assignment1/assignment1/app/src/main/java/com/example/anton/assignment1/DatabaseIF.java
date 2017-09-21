@@ -30,27 +30,27 @@ public class DatabaseIF {
         this.controller = controller;
     }
 
-    public void testData(){
-        ArrayList<Transaction> transz = new ArrayList<>();
-        Transaction trans = new Transaction("Income", "Testing1", "JohnDoe", 50.45f, "Salary", "2017-09-07");
-        Transaction trans1 = new Transaction("Expenditure", "Testing2", "JohnDoe", 60.45f, "Food", "2017-09-05");
-        Transaction trans2 = new Transaction("Expenditure", "Testing3", "JohnDoe", 70.45f, "Leisure", "2017-05-10");
-        Transaction trans3 = new Transaction("Income", "Testing4", "JohnDoe", 77.45f, "Other", "2017-05-20");
-        Transaction trans4 = new Transaction("Expenditure", "Testing5", "JohnDoe", 23.45f, "Accommodation", "2017-03-15");
-        Transaction trans5 = new Transaction("Income", "Testing6", "JohnDoe", 25.45f, "Salary", "2017-01-01");
-        Transaction trans6 = new Transaction("Expenditure", "Testing7", "JohnDoe", 43.45f, "Travel", "2017-06-10");
-        Transaction trans7 = new Transaction("Income", "Testing8", "JohnDoe", 123.45f, "Other", "2017-03-03");
-        transz.add(trans);
-        transz.add(trans1);
-        transz.add(trans2);
-        transz.add(trans3);
-        transz.add(trans4);
-        transz.add(trans5);
-        transz.add(trans6);
-        transz.add(trans7);
-
-        addTransactionList(transz);
-    }
+//    public void testData(){
+//        ArrayList<Transaction> transz = new ArrayList<>();
+//        Transaction trans = new Transaction("Income", "Testing1", "JohnDoe", 50.45f, "Salary", "2017-09-07");
+//        Transaction trans1 = new Transaction("Expenditure", "Testing2", "JohnDoe", 60.45f, "Food", "2017-09-05");
+//        Transaction trans2 = new Transaction("Expenditure", "Testing3", "JohnDoe", 70.45f, "Leisure", "2017-05-10");
+//        Transaction trans3 = new Transaction("Income", "Testing4", "JohnDoe", 77.45f, "Other", "2017-05-20");
+//        Transaction trans4 = new Transaction("Expenditure", "Testing5", "JohnDoe", 23.45f, "Accommodation", "2017-03-15");
+//        Transaction trans5 = new Transaction("Income", "Testing6", "JohnDoe", 25.45f, "Salary", "2017-01-01");
+//        Transaction trans6 = new Transaction("Expenditure", "Testing7", "JohnDoe", 43.45f, "Travel", "2017-06-10");
+//        Transaction trans7 = new Transaction("Income", "Testing8", "JohnDoe", 123.45f, "Other", "2017-03-03");
+//        transz.add(trans);
+//        transz.add(trans1);
+//        transz.add(trans2);
+//        transz.add(trans3);
+//        transz.add(trans4);
+//        transz.add(trans5);
+//        transz.add(trans6);
+//        transz.add(trans7);
+//
+//        addTransactionList(transz);
+//    }
 
     public void addTransactionList(ArrayList<Transaction> transaction){
         SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
@@ -62,7 +62,7 @@ public class DatabaseIF {
             values.put(TransactionDBHelper.COLUMN_AMOUNT, transaction.get(i).getAmount());
             values.put(TransactionDBHelper.COLUMN_CATEGORY, transaction.get(i).getCategory());
             values.put(TransactionDBHelper.COLUMN_DATE, transaction.get(i).getDate());
-            db.insert(TransactionDBHelper.TABLE_NAME, "", values);
+            db.update(TransactionDBHelper.TABLE_NAME, values ,TransactionDBHelper.COLUMN_ID + " = " + transaction.get(i).getId(), null);
         }
     }
 
@@ -86,16 +86,20 @@ public class DatabaseIF {
         String toDate = "";
         switch(range){
             case "Year":
-                fromDate = getCalculatedDate(0);
-                toDate = getCalculatedDate(-365);
+                fromDate = getCalculatedDate(-365);
+                toDate = getCalculatedDate(0);
                 break;
             case "Month":
-                fromDate = getCalculatedDate(0);
-                toDate = getCalculatedDate(-31);
+                fromDate = getCalculatedDate(-31);
+                toDate = getCalculatedDate(0);
                 break;
             case "Week":
+                fromDate = getCalculatedDate(-7);
+                toDate = getCalculatedDate(0);
+                break;
+            case "Today":
                 fromDate = getCalculatedDate(0);
-                toDate = getCalculatedDate(-7);
+                toDate = getCalculatedDate(0);
                 break;
             case "Other":
                 fromDate = controller.getCustomDateFrom();
@@ -103,7 +107,7 @@ public class DatabaseIF {
         }
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_TYPE + " = ?" + " AND " + TransactionDBHelper.COLUMN_USERID + " = ?" + " AND "
-                +  TransactionDBHelper.COLUMN_DATE + " between" + " ? " + "AND" + " ? ", new String[]{"Income", controller.getCurrentUserName(), toDate, fromDate});
+                +  TransactionDBHelper.COLUMN_DATE + " between" + " ? " + "AND" + " ? ", new String[]{"Income", controller.getCurrentUserName(), fromDate, toDate});
         ArrayList<Transaction> transactions = new ArrayList<Transaction>();
         idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
         titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
@@ -132,16 +136,16 @@ public class DatabaseIF {
         String toDate = "";
         switch(range){
             case "Year":
-                fromDate = getCalculatedDate(0);
-                toDate = getCalculatedDate(-365);
-                break;
+                  fromDate = getCalculatedDate(-365);
+                  toDate = getCalculatedDate(0);
+                  break;
             case "Month":
-                fromDate = getCalculatedDate(0);
-                toDate = getCalculatedDate(-31);
+                fromDate = getCalculatedDate(-31);
+                toDate = getCalculatedDate(0);
                 break;
             case "Week":
-                fromDate = getCalculatedDate(0);
-                toDate = getCalculatedDate(-7);
+                fromDate = getCalculatedDate(-7);
+                toDate = getCalculatedDate(0);
                 break;
             case "Today":
                 fromDate = getCalculatedDate(0);
@@ -154,7 +158,7 @@ public class DatabaseIF {
 
         SQLiteDatabase db = transactionDBHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TransactionDBHelper.TABLE_NAME + " WHERE " + TransactionDBHelper.COLUMN_TYPE + " = ?" + " AND " + TransactionDBHelper.COLUMN_USERID + " = ?" + " AND "
-                +  TransactionDBHelper.COLUMN_DATE + " between" + " ? " + "AND" + " ? " , new String[]{"Expenditure", controller.getCurrentUserName(), toDate, fromDate});
+                +  TransactionDBHelper.COLUMN_DATE + " between" + " ? " + "AND" + " ? " , new String[]{"Expenditure", controller.getCurrentUserName(), fromDate, toDate});
         ArrayList<Transaction> transactions = new ArrayList<Transaction>();
         idIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_ID);
         titleIndex = cursor.getColumnIndex(TransactionDBHelper.COLUMN_TITLE);
@@ -220,7 +224,7 @@ public class DatabaseIF {
 
     public Boolean addUser(String username, String name, String lastname, String password){
         SQLiteDatabase db = userDBHelper.getWritableDatabase();
-//        userDBHelper.onCreate(db);
+//        userDBHelper.onUpgrade(db, 1, 2);
 
         String query = "SELECT * FROM " + UserDBHelper.TABLE_NAME + " WHERE " + UserDBHelper.COLUMN_USERID + " = ?";
         Cursor c = db.rawQuery(query, new String[]{username});
@@ -329,7 +333,6 @@ public class DatabaseIF {
 
         Log.e("AddbarCode", barCode.getId() + barCode.getCategory() + barCode.getTitle() + barCode.getAmount());
 
-//        barCodeDBHelper.onCreate(db);
         ContentValues values = new ContentValues();
         values.put(BarCodeDBHelper.COLUMN_ID, barCode.getId());
         values.put(BarCodeDBHelper.COLUMN_TITLE, barCode.getTitle());
@@ -342,7 +345,6 @@ public class DatabaseIF {
 
     public void addBarCodeList(ArrayList<BarCode> barCodes){
         SQLiteDatabase db = barCodeDBHelper.getWritableDatabase();
-//        barCodeDBHelper.onCreate(db);
         for(BarCode barcode: barCodes){
             ContentValues values = new ContentValues();
             values.put(BarCodeDBHelper.COLUMN_ID, barcode.getId());
@@ -357,8 +359,7 @@ public class DatabaseIF {
     public BarCode getBarCode(String id){
         SQLiteDatabase db = barCodeDBHelper.getWritableDatabase();
 
-//        BarCode barCode1 = new BarCode("7350015501287", "snus","Leisure", 35.45f);
-//        addBarCode(barCode1);
+
         Log.e("GetBarCodeId" , id);
         int idIndex, titleIndex, categoryIndex, amountIndex;
 
@@ -389,5 +390,14 @@ public class DatabaseIF {
     }
 
 
+    public Boolean deleteTransaction(int i) {
+        SQLiteDatabase db = transactionDBHelper.getWritableDatabase();
+        try{
+            db.delete(TransactionDBHelper.TABLE_NAME, TransactionDBHelper.COLUMN_ID + " = " + i, null);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
 
+    }
 }
