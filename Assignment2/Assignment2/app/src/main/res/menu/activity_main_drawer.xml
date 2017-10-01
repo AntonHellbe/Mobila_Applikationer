@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/map"
+            android:icon="@drawable/google_maps"
+            android:title="Map" />
+        <item
+            android:id="@+id/members"
+            android:icon="@drawable/members"
+            android:title="Members" />
+        <item
+            android:id="@+id/groups"
+            android:icon="@drawable/groups"
+            android:title="Groups" />
+        <item
+            android:id="@+id/chat"
+            android:icon="@drawable/chat"
+            android:title="Chat"
+            />
+        <item
+            android:id="@+id/register"
+            android:icon="@drawable/register"
+            android:title="Register"
+            />
+        <!--<item-->
+            <!--android:id="@+id/nav_manage"-->
+            <!--android:icon="@drawable/ic_menu_manage"-->
+            <!--android:title="Tools" />-->
+    </group>
+
+
+</menu>
