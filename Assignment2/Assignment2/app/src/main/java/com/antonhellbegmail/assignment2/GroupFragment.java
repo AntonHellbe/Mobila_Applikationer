@@ -19,7 +19,7 @@ public class GroupFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager lm;
-    private GroupAdapter groupAdpater;
+    private GroupAdapter groupAdapter;
 
     @Nullable
     @Override
@@ -29,24 +29,31 @@ public class GroupFragment extends Fragment {
         return rootView;
     }
 
+
     private void initializeComponents(View rootView) {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.rv);
         recyclerView.setHasFixedSize(true);
         lm = new LinearLayoutManager(getActivity());
-        groupAdpater = new GroupAdapter();
+        groupAdapter = new GroupAdapter(this);
         recyclerView.setLayoutManager(lm);
     }
 
-    public void setAdapter(ArrayList<Group> groupList){
-        groupAdpater.setGroups(groupList);
-        recyclerView.setAdapter(groupAdpater);
+    public void setAdapter(GroupAdapter groupAdapter){
+        recyclerView.setAdapter(groupAdapter);
     }
 
     @Override
     public void onResume() {
-        ((MainActivity)getActivity()).getController().setGroupAdapter();
+        ((MainActivity)getActivity()).getController().updateGroupFragment(this);
         super.onResume();
     }
+
+    public void updateGroups(ArrayList<Group> groupList){
+        ((GroupAdapter)recyclerView.getAdapter()).setGroups(groupList);
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+
 
 
 }

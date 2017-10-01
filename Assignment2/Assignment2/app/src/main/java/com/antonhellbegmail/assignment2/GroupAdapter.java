@@ -1,10 +1,12 @@
 package com.antonhellbegmail.assignment2;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -14,14 +16,25 @@ import java.util.ArrayList;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
 
-    ArrayList<Group> groupList;
+    private ArrayList<Group> groupList;
+    private String currentUsername;
+    private GroupFragment groupFragment;
+
+
+
+    public GroupAdapter(GroupFragment groupFragment){
+        this.groupFragment = groupFragment;
+        groupList = new ArrayList<>();
+    }
+
 
     public void setGroups(ArrayList<Group> groupList){
         this.groupList = groupList;
     }
 
+
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_layout, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -29,7 +42,9 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        holder.tvType.setText("Group Name:");
         holder.tvGroupName.setText(groupList.get(position).getName());
+
 
     }
 
@@ -38,15 +53,32 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         return groupList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public String getCurrentUsername() {
+        return currentUsername;
+    }
+
+    public void setCurrentUsername(String currentUsername) {
+        this.currentUsername = currentUsername;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         RecyclerView rv;
-        TextView tvGroupName;
+        TextView tvGroupName, tvType;
+
 
 
         public ViewHolder(View itemView) {
             super(itemView);
-
+            itemView.setOnClickListener(this);
+            tvType = (TextView) itemView.findViewById(R.id.tvType);
             tvGroupName = (TextView) itemView.findViewById(R.id.tvGroupName);
         }
+
+        @Override
+        public void onClick(View view) {
+            ((MainActivity)groupFragment.getActivity()).getController().setGroupFragment(tvGroupName.getText().toString());
+        }
     }
+
+
 }

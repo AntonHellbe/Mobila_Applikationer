@@ -3,9 +3,16 @@ package com.antonhellbegmail.assignment2;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,9 +20,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-/**
- * Created by Anton on 2017-09-29.
- */
 
 public class Controller {
 
@@ -24,6 +28,7 @@ public class Controller {
     private MemberFragment memberFragment;
     private RegisterFragment registerFragment;
     private MapFragment mapFragment;
+    private DisplayGroupFragment displayFrag;
     private DataFragment dataFragment;
     private CommService commService;
 
@@ -36,6 +41,8 @@ public class Controller {
     private ServerCommands serverCommands;
     private int currentFragment = 0;
 
+    private FusedLocationProviderClient mFusedLocationClient;
+
     public Controller(MainActivity mainActivity){
         this.mainActivity = mainActivity;
 
@@ -46,9 +53,9 @@ public class Controller {
         this.mapFragment = new MapFragment();
         this.memberFragment = new MemberFragment();
         this.registerFragment = new RegisterFragment();
+        this.displayFrag = new DisplayGroupFragment();
 
-
-
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mainActivity);
         serverCommands = new ServerCommands();
 
         switchFragment(currentFragment);
@@ -70,7 +77,6 @@ public class Controller {
             mainActivity.startService(intent);
             dataFragment.setServiceExist(true);
         }else {
-            Log.d("CONTROLLER", "BINDING EXISTING SERVICE!!!");
             connected = dataFragment.getConnected();
         }
         serviceConnection = new ServiceConnection();
@@ -104,7 +110,6 @@ public class Controller {
     }
 
     public void connect(){
-        Log.v("CONTROLLER", "CONNECTING");
         connected = true;
         dataFragment.setConnected(connected);
         commService.connect();
@@ -117,15 +122,6 @@ public class Controller {
             dataFragment.setConnected(connected);
             commService.disconnect();
         }
-    }
-
-    public void sendClicked() {
-//        JSONObject temp = serverCommands.register("login_group", "Anton");
-//        JSONObject temp = serverCommands.setPosition("1506699938309", "15.0", "45.0");
-        JSONObject temp = serverCommands.currentGroups();
-        Log.d("RECIEVED JSONOBJECT", temp.toString());
-        commService.send(temp);
-
     }
 
     public void setFragment(int fragment) {
@@ -168,27 +164,48 @@ public class Controller {
 
     public void setGroupAdapter() {
         JSONObject groupsObject = serverCommands.currentGroups();
-        commService.send(groupsObject);
+        if(commService != null){
+            commService.send(groupsObject);
+        }
     }
 
+
     public void setMemberAdapter(){
-        JSONObject membersObject = serverCommands.groupMembers("login_group");
+        JSONObject membersObject = serverCommands.groupMembers(dataFragment.getCurrentGroup());
         Log.d("CONTROLLER", "CALLING" + commService);
         if(commService != null){
             commService.send(membersObject);
+        }else {
+            memberFragment.setData(dataFragment.getCurrentMemberList());
         }
+
+
+
+
     }
 
-    public String register(String s) {
-        if(s.equals("")){
-            return "Empty username field";
+    public String register(String name, String group) {
+        if(name.equals("") || group.equals("")){
+            return "Empty field or missing field";
         }
-        currentUsername = s;
-        dataFragment.setCurrentUsername(s);
+        currentUsername = name;
+        dataFragment.setCurrentUsername(name);
+        dataFragment.setCurrentGroup(group);
 
-        JSONObject registerObject = serverCommands.register("login_group", s);
+        JSONObject registerObject = serverCommands.register(group, name);
         commService.send(registerObject);
-        return "Registration successfull!";
+
+        return "Registration successful!";
+    }
+
+    public String registerToExistingGroup(String group){
+        if(currentUsername.equals("")){
+            Toast.makeText(mainActivity, "You need to register before joining a group", Toast.LENGTH_SHORT).show();
+            return "";
+        }
+        JSONObject registerObject = serverCommands.register(group, currentUsername);
+        commService.send(registerObject);
+        return "";
     }
 
     public String getCurrentUsername() {
@@ -200,8 +217,60 @@ public class Controller {
     public void rescueMission() {
         currentFragment = dataFragment.getCurrentFragment();
         currentUsername = dataFragment.getCurrentUsername();
-//        initComService();
         switchFragment(currentFragment);
+    }
+
+
+    public void setMarkers() {
+        mapFragment.placeMarker(dataFragment.getCurrentPositionList());
+    }
+
+    public void setGroupFragment(String groupName) {
+        JSONObject groupObject = serverCommands.groupMembers(groupName);
+        commService.send(groupObject);
+
+        mainActivity.setFragment(displayFrag, true);
+    }
+
+    public void setMemberInformation() {
+        ArrayList<Member> tempList = dataFragment.getCurrentMemberList();
+        for(Member mem: tempList){
+            displayFrag.setTvGroupMembers(mem.getName());
+        }
+    }
+
+    public int getCurrentFragment() {
+        return currentFragment;
+    }
+
+    public void updateGroupFragment(GroupFragment groupFragment) {
+        GroupAdapter g = new GroupAdapter(groupFragment);
+        groupFragment.setAdapter(g);
+        JSONObject group = serverCommands.currentGroups();
+
+        if(commService != null) {
+            commService.send(group);
+        }else{
+            groupFragment.updateGroups(dataFragment.getCurrentGroupList());
+        }
+
+    }
+
+    private class PositionUpdater implements Runnable{
+
+        Handler handler = new Handler();
+
+        @Override
+        public void run() {
+            try {
+                initPosition();
+            }catch(Exception e){
+
+            }finally {
+                handler.postDelayed(this, 30000);
+            }
+
+        }
     }
 
     private class ServiceConnection implements android.content.ServiceConnection{
@@ -209,23 +278,19 @@ public class Controller {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             CommService.LocalService ls = (CommService.LocalService) iBinder;
-            Log.d("CONTROLLER", "COMMSERVICE CONNECTED!!");
             commService = ls.getService();
             bound = true;
             listener = new Listener();
             listener.start();
-            connect();
+            if(connected == false){
+                connect();
+            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             bound = false;
         }
-    }
-
-    public void getCurrentMemberList(){
-        memberFragment.setData(dataFragment.getCurrentMemberList());
-
     }
 
     private class Listener extends Thread{
@@ -274,10 +339,11 @@ public class Controller {
 
     public void recievedData(String message){
         JSONObject recievedObject;
-        String type, id, group, longitude, latitude;
+        String type, id, group;
         JSONArray arr;
         ArrayList<Member> memberList;
         ArrayList<Group> groupList;
+        ArrayList<Member> positionList;
         try{
             recievedObject = new JSONObject(message);
             type = recievedObject.getString(ServerCommands._TYPE);
@@ -287,6 +353,9 @@ public class Controller {
                 case ServerCommands._REGISTER:
                     group = recievedObject.getString(ServerCommands._GROUP);
                     id = recievedObject.getString(ServerCommands._ID);
+                    dataFragment.setCurrentId(id);
+                    Log.d("RECIEVED ID : ", id);
+                    mainActivity.runOnUiThread(new PositionUpdater());
                     break;
 
                 case ServerCommands._MEMBERS:
@@ -298,6 +367,8 @@ public class Controller {
                         memberList.add(new Member(member.getString(ServerCommands._MEMBER)));
                     }
                     dataFragment.setCurrentMemberList(memberList);
+                    memberFragment.setData(memberList);
+
                     break;
 
                 case ServerCommands._GROUPS:
@@ -309,17 +380,29 @@ public class Controller {
                         groupList.add(new Group(group1.getString(ServerCommands._GROUP)));
                     }
 
-                    groupFragment.setAdapter(groupList);
+                    dataFragment.setCurrentGroupList(groupList);
+                    groupFragment.updateGroups(groupList);
                     break;
 
                 case ServerCommands._UNREGISTER:
 
                     break;
 
-                case ServerCommands._LOCATION:
-                    id = recievedObject.getString(ServerCommands._ID);
-                    longitude = recievedObject.getString(ServerCommands._LONGITUDE);
-                    latitude = recievedObject.getString(ServerCommands._LATITUDE);
+                case ServerCommands._LOCATIONS:
+                    arr = recievedObject.getJSONArray(ServerCommands._LOCATION);
+                    positionList = new ArrayList<>();
+                    JSONObject member1;
+                    for(int i = 0; i < arr.length(); i++){
+                        member1 = arr.getJSONObject(i);
+                        positionList.add(new Member(member1.getString(ServerCommands._MEMBER), member1.getString(ServerCommands._LONGITUDE), member1.getString(ServerCommands._LATITUDE)));
+                    }
+
+                    dataFragment.setCurrentPositionList(positionList);
+                    break;
+
+                case ServerCommands._EXCEPTION:
+                    JSONObject json = serverCommands.register(dataFragment.getCurrentUsername(), dataFragment.getCurrentGroup());
+                    commService.send(json);
 
                     break;
 
@@ -329,6 +412,19 @@ public class Controller {
 
         }
 
+    }
+
+    public void initPosition(){
+        mFusedLocationClient.getLastLocation().
+                addOnSuccessListener(mainActivity, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if(location != null){
+                            JSONObject tempObj = serverCommands.setPosition(dataFragment.getCurrentId(), String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()));
+                            commService.send(tempObj);
+                        }
+                    }
+                });
     }
 
 }

@@ -14,7 +14,7 @@ import android.widget.Toast;
 public class RegisterFragment extends Fragment {
 
     private Button btnRegister;
-    private EditText etUsername;
+    private EditText etUsername, etGroup;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -31,6 +31,7 @@ public class RegisterFragment extends Fragment {
     private void initializeComponents(View rootView) {
         btnRegister = rootView.findViewById(R.id.btnRegister);
         etUsername =  rootView.findViewById(R.id.etUsername);
+        etGroup = rootView.findViewById(R.id.etGroup);
     }
 
 
@@ -40,7 +41,7 @@ public class RegisterFragment extends Fragment {
             String result;
             switch(view.getId()){
                 case R.id.btnRegister:
-                    result = ((MainActivity)getActivity()).getController().register(etUsername.getText().toString());
+                    result = ((MainActivity)getActivity()).getController().register(etUsername.getText().toString(), etGroup.getText().toString());
                     Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
             }
         }

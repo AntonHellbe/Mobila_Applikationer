@@ -12,9 +12,6 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-/**
- * Created by Anton on 2017-09-29.
- */
 
 public class MemberFragment extends Fragment {
 
@@ -39,21 +36,14 @@ public class MemberFragment extends Fragment {
         recyclerView.setAdapter(memberAdapter);
     }
 
-//    public void setAdapter(ArrayList<Member> memberList){
-//        Log.v("ADAPTER", "ADAPTER SET " + memberList.size());
-//        memberAdapter.setMemberList(memberList);
-//        recyclerView.setAdapter(memberAdapter);
-//    }
-
     @Override
     public void onResume() {
-//        setAdapter(new ArrayList<Member>());
         ((MainActivity)getActivity()).getController().setMemberAdapter();
-        ((MainActivity)getActivity()).getController().getCurrentMemberList();
         super.onResume();
     }
 
     public void setData(ArrayList<Member> memberList) {
         ((MemberAdapter)recyclerView.getAdapter()).setMemberList(memberList);
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 }

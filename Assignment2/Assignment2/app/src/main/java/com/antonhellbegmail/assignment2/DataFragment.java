@@ -19,8 +19,14 @@ public class DataFragment extends Fragment {
     private Boolean connected = false;
     private Boolean serviceExist = false;
     private String currentUsername = "";
+    private String currentGroup = "";
     private int currentFragment = 0;
+    private String currentId;
+
+
     private ArrayList<Member> currentMemberList = new ArrayList<>();
+    private ArrayList<Member> currentPositionList = new ArrayList<>();
+    private ArrayList<Group> currentGroupList = new ArrayList<>();
 
 
     @Override
@@ -82,5 +88,37 @@ public class DataFragment extends Fragment {
 
     public void setCurrentMemberList(ArrayList<Member> currentMemberList) {
         this.currentMemberList = currentMemberList;
+    }
+
+    public String getCurrentId() {
+        return currentId;
+    }
+
+    public void setCurrentId(String currentId) {
+        this.currentId = currentId;
+    }
+
+    public ArrayList<Member> getCurrentPositionList() {
+        return currentPositionList;
+    }
+
+    public void setCurrentPositionList(ArrayList<Member> currentPositionList) {
+        this.currentPositionList = currentPositionList;
+    }
+
+    public ArrayList<Group> getCurrentGroupList() {
+        return currentGroupList;
+    }
+
+    public void setCurrentGroupList(ArrayList<Group> currentGroupList) {
+        this.currentGroupList = currentGroupList;
+    }
+
+    public void setCurrentGroup(String currentGroup) {
+        this.currentGroup = currentGroup;
+    }
+
+    public String getCurrentGroup() {
+        return currentGroup;
     }
 }

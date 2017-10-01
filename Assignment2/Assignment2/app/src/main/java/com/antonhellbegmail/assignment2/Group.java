@@ -5,6 +5,7 @@ package com.antonhellbegmail.assignment2;
  */
 
 public class Group {
+
     private String name;
 
     public Group(String name){

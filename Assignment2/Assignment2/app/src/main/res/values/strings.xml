@@ -6,4 +6,9 @@
     <string name="google_maps_key">AIzaSyBuOuyv4Sv_m1HRGZ_rhRtl3Ss3bD1KaQk</string>
     <string name="action_settings">Settings</string>
     <string name="register">Register</string>
+    <string name="name">Name</string>
+    <string name="group">Group</string>
+    <string name="group_name">Group Name:</string>
+    <string name="Back">Back</string>
+    <string name="Group_members">Group members</string>
 </resources>

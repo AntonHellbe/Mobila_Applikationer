@@ -24,6 +24,7 @@ public class ServerCommands {
     public static final String _ID = "id";
     public static final String _LONGITUDE = "longitude";
     public static final String _LATITUDE = "latitude";
+    public static final String _EXCEPTION = "exception" ;
 
     public ServerCommands(){
 

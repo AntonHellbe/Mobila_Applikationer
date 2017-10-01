@@ -8,6 +8,7 @@ public class Member {
     private String name;
     private String longitude;
     private String latitude;
+    private String id;
 
     public Member(String name, String longitude, String latitude){
         this.name = name;
@@ -41,5 +42,13 @@ public class Member {
 
     public void setLatitude(String latitude) {
         this.latitude = latitude;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
