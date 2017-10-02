@@ -48,7 +48,7 @@ public class GroupFragment extends Fragment {
         super.onResume();
     }
 
-    public void updateGroups(ArrayList<Group> groupList){
+    public void updateGroups(ArrayList<String> groupList){
         ((GroupAdapter)recyclerView.getAdapter()).setGroups(groupList);
         recyclerView.getAdapter().notifyDataSetChanged();
     }

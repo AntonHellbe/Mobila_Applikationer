@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:textSize="15sp"
         android:textStyle="bold"
-        android:text="@string/Group_members"/>
+        android:id="@+id/tvGroupname"
+        />
 
     <TextView
         android:layout_width="match_parent"
@@ -23,6 +24,18 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnBack"
         android:text="@string/Back"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnRegister"
+        android:text="@string/register"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnDeRegister"
+        android:text="@string/deregister"/>
 
 
 </LinearLayout>

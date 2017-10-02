@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
 
-    private ArrayList<Group> groupList;
+    private ArrayList<String> groupList;
     private String currentUsername;
     private GroupFragment groupFragment;
 
@@ -28,7 +28,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     }
 
 
-    public void setGroups(ArrayList<Group> groupList){
+    public void setGroups(ArrayList<String> groupList){
         this.groupList = groupList;
     }
 
@@ -43,7 +43,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.tvType.setText("Group Name:");
-        holder.tvGroupName.setText(groupList.get(position).getName());
+        holder.tvGroupName.setText(groupList.get(position));
 
 
     }

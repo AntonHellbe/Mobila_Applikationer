@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Anton on 2017-09-29.
@@ -21,12 +22,19 @@ public class DataFragment extends Fragment {
     private String currentUsername = "";
     private String currentGroup = "";
     private int currentFragment = 0;
-    private String currentId;
+    private String currentId = "";
+    private double currentLat;
+    private double currentLong;
+    private String clickedGroup = "";
 
 
-    private ArrayList<Member> currentMemberList = new ArrayList<>();
+    private HashMap<String, ArrayList<Member>> membermap = new HashMap<>();
+    private HashMap<String, String> idMap = new HashMap<>();
+
+    private ArrayList<String> myGroups = new ArrayList<>();
     private ArrayList<Member> currentPositionList = new ArrayList<>();
-    private ArrayList<Group> currentGroupList = new ArrayList<>();
+    private ArrayList<String> groupList = new ArrayList<>();
+    private ArrayList<Member> clickedGroupList = new ArrayList<>();
 
 
     @Override
@@ -82,14 +90,6 @@ public class DataFragment extends Fragment {
         this.currentFragment = currentFragment;
     }
 
-    public ArrayList<Member> getCurrentMemberList() {
-        return currentMemberList;
-    }
-
-    public void setCurrentMemberList(ArrayList<Member> currentMemberList) {
-        this.currentMemberList = currentMemberList;
-    }
-
     public String getCurrentId() {
         return currentId;
     }
@@ -106,13 +106,6 @@ public class DataFragment extends Fragment {
         this.currentPositionList = currentPositionList;
     }
 
-    public ArrayList<Group> getCurrentGroupList() {
-        return currentGroupList;
-    }
-
-    public void setCurrentGroupList(ArrayList<Group> currentGroupList) {
-        this.currentGroupList = currentGroupList;
-    }
 
     public void setCurrentGroup(String currentGroup) {
         this.currentGroup = currentGroup;
@@ -120,5 +113,70 @@ public class DataFragment extends Fragment {
 
     public String getCurrentGroup() {
         return currentGroup;
+    }
+
+    public double getCurrentLat() {
+        return currentLat;
+    }
+
+    public void setCurrentLat(double currentLat) {
+        this.currentLat = currentLat;
+    }
+
+    public double getCurrentLong() {
+        return currentLong;
+    }
+
+    public void setCurrentLong(double currentLong) {
+        this.currentLong = currentLong;
+    }
+
+    public void addToMap(String group, ArrayList<Member> memberList){
+        membermap.put(group, memberList);
+
+    }
+
+    public ArrayList<Member> getFromMap(String groupname){
+        return membermap.get(groupname);
+    }
+
+    public ArrayList<String> getGroupList() {
+        return groupList;
+    }
+
+    public void setGroupList(ArrayList<String> groupList) {
+        this.groupList = groupList;
+    }
+
+    public void addGroup(String group){
+        myGroups.add(group);
+    }
+
+    public ArrayList<String> getMyGroups(){
+        return myGroups;
+    }
+
+    public void setClickedGroup(String clickedGroup) {
+        this.clickedGroup = clickedGroup;
+    }
+
+    public String getClickedGroup(){
+        return this.clickedGroup;
+    }
+
+    public ArrayList<Member> getClickedGroupList() {
+        return clickedGroupList;
+    }
+
+    public void setClickedGroupList(ArrayList<Member> clickedGroupList) {
+        this.clickedGroupList = clickedGroupList;
+    }
+
+    public void addToIdMap(String groupName, String id) {
+        idMap.put(groupName, id);
+    }
+
+    public String getFromIdMap(String groupname){
+        return idMap.get(groupname);
     }
 }

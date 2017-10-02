@@ -2,27 +2,28 @@ package com.antonhellbegmail.assignment2;
 
 import android.app.FragmentManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class Controller {
 
+    private android.location.LocationListener locationListener;
     private MainActivity mainActivity;
     private GroupFragment groupFragment;
     private MemberFragment memberFragment;
@@ -33,7 +34,7 @@ public class Controller {
     private CommService commService;
 
 
-    private String currentUsername;
+    private String currentUsername = "";
     private boolean connected = false;
     private ServiceConnection serviceConnection;
     private Listener listener;
@@ -41,10 +42,16 @@ public class Controller {
     private ServerCommands serverCommands;
     private int currentFragment = 0;
 
-    private FusedLocationProviderClient mFusedLocationClient;
+    private double currentLat = 0;
+    private double currentLong = 0;
+
+    private LocationManager locationManager;
 
     public Controller(MainActivity mainActivity){
         this.mainActivity = mainActivity;
+        this.locationListener = new LocList();
+
+        locationManager = (LocationManager) mainActivity.getSystemService(Context.LOCATION_SERVICE);
 
         initDataFragment();
         initComService();
@@ -55,7 +62,7 @@ public class Controller {
         this.registerFragment = new RegisterFragment();
         this.displayFrag = new DisplayGroupFragment();
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mainActivity);
+
         serverCommands = new ServerCommands();
 
         switchFragment(currentFragment);
@@ -90,7 +97,42 @@ public class Controller {
 
 
     public void onResume(){
-        if(connected){
+        Timer time = new Timer();
+        time.schedule(new TimerTask(),0, 20000);
+
+    }
+
+
+    public void setStartPosition(double startLong, double startLat) {
+        this.currentLong = startLong;
+        this.currentLat = startLat;
+    }
+
+    public void unRegisterFromGroup(String s) {
+    }
+
+    private class LocList implements android.location.LocationListener{
+
+        @Override
+        public void onLocationChanged(Location location) {
+            currentLat = location.getLatitude();
+            currentLong = location.getLongitude();
+            dataFragment.setCurrentLat(location.getLatitude());
+            dataFragment.setCurrentLong(location.getLongitude());
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
 
         }
     }
@@ -175,13 +217,26 @@ public class Controller {
         Log.d("CONTROLLER", "CALLING" + commService);
         if(commService != null){
             commService.send(membersObject);
-        }else {
-            memberFragment.setData(dataFragment.getCurrentMemberList());
         }
 
+        memberFragment.setData(gatherAllMembers());
 
+    }
 
+    public ArrayList<Member> gatherAllMembers(){
 
+        ArrayList<String> myGroups = dataFragment.getMyGroups();
+        ArrayList<Member> allMembers = new ArrayList<>();
+        for(int i = 0; i < myGroups.size(); i++){
+            Log.v("CONTROLLER FIRST GROUP", myGroups.get(i));
+            ArrayList<Member> tempList = dataFragment.getFromMap(myGroups.get(i));
+
+            for(int j = 0; j < tempList.size(); j++){
+                allMembers.add(tempList.get(j));
+            }
+        }
+
+        return allMembers;
     }
 
     public String register(String name, String group) {
@@ -203,15 +258,10 @@ public class Controller {
             Toast.makeText(mainActivity, "You need to register before joining a group", Toast.LENGTH_SHORT).show();
             return "";
         }
-        JSONObject registerObject = serverCommands.register(group, currentUsername);
+        JSONObject registerObject = serverCommands.register(group, dataFragment.getCurrentUsername());
         commService.send(registerObject);
         return "";
     }
-
-    public String getCurrentUsername() {
-        return currentUsername;
-    }
-
 
 
     public void rescueMission() {
@@ -229,14 +279,25 @@ public class Controller {
         JSONObject groupObject = serverCommands.groupMembers(groupName);
         commService.send(groupObject);
 
+
         mainActivity.setFragment(displayFrag, true);
     }
 
     public void setMemberInformation() {
-        ArrayList<Member> tempList = dataFragment.getCurrentMemberList();
+        ArrayList<Member> tempList = dataFragment.getClickedGroupList();
+
+        displayFrag.setBtnDeRegister(false);
+        displayFrag.setBtnRegister(true);
+
         for(Member mem: tempList){
+            if (mem.getName().equals(currentUsername)){
+                displayFrag.setBtnDeRegister(true);
+                displayFrag.setBtnRegister(false);
+            }
             displayFrag.setTvGroupMembers(mem.getName());
         }
+
+        displayFrag.setTvGroupName(dataFragment.getClickedGroup());
     }
 
     public int getCurrentFragment() {
@@ -251,26 +312,9 @@ public class Controller {
         if(commService != null) {
             commService.send(group);
         }else{
-            groupFragment.updateGroups(dataFragment.getCurrentGroupList());
+            groupFragment.updateGroups(dataFragment.getGroupList());
         }
 
-    }
-
-    private class PositionUpdater implements Runnable{
-
-        Handler handler = new Handler();
-
-        @Override
-        public void run() {
-            try {
-                initPosition();
-            }catch(Exception e){
-
-            }finally {
-                handler.postDelayed(this, 30000);
-            }
-
-        }
     }
 
     private class ServiceConnection implements android.content.ServiceConnection{
@@ -316,6 +360,25 @@ public class Controller {
         }
     }
 
+    private class TimerTask extends java.util.TimerTask{
+
+        @Override
+        public void run() {
+            setPosition();
+        }
+    }
+
+    public void setPosition(){
+        if(connected != false && !dataFragment.getCurrentUsername().equals("")){
+            ArrayList<String> temp = dataFragment.getMyGroups();
+            for(int i = 0; i < temp.size(); i++) {
+                JSONObject sendObject = serverCommands.setPosition(dataFragment.getFromIdMap(temp.get(i)), String.valueOf(currentLat), String.valueOf(currentLong));
+                commService.send(sendObject);
+            }
+        }
+
+    }
+
     private class UpdateUI implements Runnable{
         private String message;
 
@@ -342,7 +405,7 @@ public class Controller {
         String type, id, group;
         JSONArray arr;
         ArrayList<Member> memberList;
-        ArrayList<Group> groupList;
+        ArrayList<String> groupList;
         ArrayList<Member> positionList;
         try{
             recievedObject = new JSONObject(message);
@@ -353,9 +416,11 @@ public class Controller {
                 case ServerCommands._REGISTER:
                     group = recievedObject.getString(ServerCommands._GROUP);
                     id = recievedObject.getString(ServerCommands._ID);
-                    dataFragment.setCurrentId(id);
                     Log.d("RECIEVED ID : ", id);
-                    mainActivity.runOnUiThread(new PositionUpdater());
+                    dataFragment.addToIdMap(group, id);
+                    dataFragment.addGroup(group);
+                    dataFragment.addToMap(group, new ArrayList<Member>());
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000, 0, locationListener);
                     break;
 
                 case ServerCommands._MEMBERS:
@@ -366,9 +431,8 @@ public class Controller {
                         member = arr.getJSONObject(i);
                         memberList.add(new Member(member.getString(ServerCommands._MEMBER)));
                     }
-                    dataFragment.setCurrentMemberList(memberList);
-                    memberFragment.setData(memberList);
-
+                    dataFragment.setClickedGroup(recievedObject.getString(ServerCommands._GROUP));
+                    dataFragment.setClickedGroupList(memberList);
                     break;
 
                 case ServerCommands._GROUPS:
@@ -377,10 +441,10 @@ public class Controller {
                     JSONObject group1;
                     for(int i = 0; i < arr.length(); i++){
                         group1 = arr.getJSONObject(i);
-                        groupList.add(new Group(group1.getString(ServerCommands._GROUP)));
+                        groupList.add(group1.getString(ServerCommands._GROUP));
                     }
 
-                    dataFragment.setCurrentGroupList(groupList);
+                    dataFragment.setGroupList(groupList);
                     groupFragment.updateGroups(groupList);
                     break;
 
@@ -390,14 +454,39 @@ public class Controller {
 
                 case ServerCommands._LOCATIONS:
                     arr = recievedObject.getJSONArray(ServerCommands._LOCATION);
+                    group = recievedObject.getString(ServerCommands._GROUP);
                     positionList = new ArrayList<>();
                     JSONObject member1;
                     for(int i = 0; i < arr.length(); i++){
                         member1 = arr.getJSONObject(i);
-                        positionList.add(new Member(member1.getString(ServerCommands._MEMBER), member1.getString(ServerCommands._LONGITUDE), member1.getString(ServerCommands._LATITUDE)));
+                        positionList.add(new Member(member1.getString(ServerCommands._MEMBER), member1.getString(ServerCommands._LONGITUDE), member1.getString(ServerCommands._LATITUDE), group));
                     }
 
-                    dataFragment.setCurrentPositionList(positionList);
+                    ArrayList<Member> tempList = dataFragment.getFromMap(group);
+
+                    if(tempList.size() != 0) {
+                        if (tempList.size() < positionList.size()) {
+                            for (int i = 0; i < positionList.size(); i++) {
+                                for (int j = 0; j < tempList.size(); j++) {
+                                    if (positionList.get(j).getName().equals(tempList.get(j).getName())) {
+                                        positionList.get(j).setShowOnMap(tempList.get(j).isShowOnMap());
+                                    }
+                                }
+                            }
+                        } else {
+                            for (int i = 0; i < tempList.size(); i++) {
+                                for (int j = 0; j < positionList.size(); j++) {
+                                    if (positionList.get(j).getName().equals(tempList.get(j).getName())) {
+                                        positionList.get(j).setShowOnMap(tempList.get(j).isShowOnMap());
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                    dataFragment.addToMap(group, positionList);
+
                     break;
 
                 case ServerCommands._EXCEPTION:
@@ -414,17 +503,5 @@ public class Controller {
 
     }
 
-    public void initPosition(){
-        mFusedLocationClient.getLastLocation().
-                addOnSuccessListener(mainActivity, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if(location != null){
-                            JSONObject tempObj = serverCommands.setPosition(dataFragment.getCurrentId(), String.valueOf(location.getLongitude()), String.valueOf(location.getLatitude()));
-                            commService.send(tempObj);
-                        }
-                    }
-                });
-    }
 
 }

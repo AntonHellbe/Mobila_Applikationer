@@ -41,7 +41,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private MapView map;
     private GoogleMap googleMap;
     private LocationManager locationManager;
-    private ArrayList<Member> memList = new ArrayList<>();
+    private double startLat;
+    private double startLong;
     private float[] markerArray = {BitmapDescriptorFactory.HUE_AZURE, BitmapDescriptorFactory.HUE_BLUE, BitmapDescriptorFactory.HUE_MAGENTA, BitmapDescriptorFactory.HUE_VIOLET,
     BitmapDescriptorFactory.HUE_CYAN, BitmapDescriptorFactory.HUE_ORANGE, BitmapDescriptorFactory.HUE_ROSE};
 
@@ -105,10 +106,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         Location mLocation = locationManager.getLastKnownLocation(bestProvider);
         if(mLocation != null){
-            double currentLatitude = mLocation.getLatitude();
-            double currentLongitude = mLocation.getLongitude();
-            LatLng currentLoc = new LatLng(currentLatitude, currentLongitude);
+            startLat = mLocation.getLatitude();
+            startLong = mLocation.getLongitude();
+            LatLng currentLoc = new LatLng(startLat, startLong);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 13));
+            ((MainActivity)getActivity()).getController().setStartPosition(startLong, startLat);
         }
 
     }
@@ -128,4 +130,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    public double getStartLat() {
+        return startLat;
+    }
+
+    public void setStartLat(double startLat) {
+        this.startLat = startLat;
+    }
+
+    public double getStartLong() {
+        return startLong;
+    }
+
+    public void setStartLong(double startLong) {
+        this.startLong = startLong;
+    }
 }
