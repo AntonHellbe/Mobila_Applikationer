@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">F9BackStackNavigation</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="btnActivity">New Activity</string>
+    <string name="btnFragment">New Fragment</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

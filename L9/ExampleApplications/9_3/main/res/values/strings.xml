@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">F9ObjectAnimator</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="btnRotate">Rotera</string>
+    <string name="btnRotateAndMove">Rotera2</string>
+    <string name="btnFade">Alfa</string>
+    <string name="btnNew">New anim</string>
+</resources>
