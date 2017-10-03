@@ -108,7 +108,6 @@ public class CommService extends Service {
                 output = new DataOutputStream(socket.getOutputStream());
                 output.flush();
                 recieveBuffer.put("CONNECTED");
-                Log.v("COMMSERVICE", "CONNECTED");
                 recieve = new Recieve();
                 recieve.start();
             }catch (Exception e){

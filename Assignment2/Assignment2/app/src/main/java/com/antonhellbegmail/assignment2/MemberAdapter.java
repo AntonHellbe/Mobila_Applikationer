@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,8 +18,10 @@ import java.util.ArrayList;
 public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.ViewHolder> {
 
     private ArrayList<Member> memberList;
+    public MemberFragment memberFragment;
 
-    public MemberAdapter(){
+    public MemberAdapter(MemberFragment mem){
+        this.memberFragment = mem;
         memberList = new ArrayList<>();
     }
 
@@ -27,15 +31,16 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.ViewHolder
     }
     @Override
     public MemberAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_layout, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_layout2, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
 
     @Override
     public void onBindViewHolder(MemberAdapter.ViewHolder holder, int position) {
-        holder.tvGroupName.setText(memberList.get(position).getName());
-        holder.tvType.setText("Member name:");
+        holder.tvMemberName.setText(memberList.get(position).getName());
+        holder.tvHiddenGroup.setText(memberList.get(position).getGroup());
+        holder.swDom.setChecked(memberList.get(position).isShowOnMap());
 
     }
 
@@ -44,15 +49,25 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.ViewHolder
         return memberList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener{
         RecyclerView rv;
-        TextView tvGroupName, tvType;
+        TextView tvMemberName, tvHiddenGroup;
+        Switch swDom;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tvType = (TextView) itemView.findViewById(R.id.tvType);
-            tvGroupName = (TextView) itemView.findViewById(R.id.tvGroupName);
+            tvMemberName = (TextView) itemView.findViewById(R.id.tvMemberName);
+            tvHiddenGroup = (TextView) itemView.findViewById(R.id.tvHiddenGroup);
+            swDom = (Switch) itemView.findViewById(R.id.swDom);
+            swDom.setOnCheckedChangeListener(this);
+        }
+
+
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            ((MainActivity)memberFragment.getActivity()).getController().setShowOnMap(tvHiddenGroup.getText().toString(), tvMemberName.getText().toString(), b);
+
         }
     }
 }

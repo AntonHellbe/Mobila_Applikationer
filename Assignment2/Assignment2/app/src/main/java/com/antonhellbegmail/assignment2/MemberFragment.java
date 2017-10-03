@@ -31,7 +31,7 @@ public class MemberFragment extends Fragment {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.rv);
         recyclerView.setHasFixedSize(true);
         lm = new LinearLayoutManager(getActivity());
-        memberAdapter = new MemberAdapter();
+        memberAdapter = new MemberAdapter(this);
         recyclerView.setLayoutManager(lm);
         recyclerView.setAdapter(memberAdapter);
     }

@@ -8,6 +8,12 @@ import static com.antonhellbegmail.assignment2.R.string.group;
 
 public class Member {
     private String name;
+
+    @Override
+    public String toString() {
+        return this.name + " " + " " + this.latitude + " " + this.longitude + this.group + " " + this.showOnMap;
+    }
+
     private String longitude;
     private String latitude;
     private String id;
@@ -64,5 +70,13 @@ public class Member {
 
     public void setShowOnMap(boolean showOnMap) {
         this.showOnMap = showOnMap;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

@@ -12,4 +12,5 @@
     <string name="Back">Back</string>
     <string name="Group_members">Group members</string>
     <string name="deregister">Deregister</string>
+    <string name="memberName">Member name:</string>
 </resources>

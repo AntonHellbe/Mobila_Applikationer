@@ -17,7 +17,6 @@ import java.util.ArrayList;
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
 
     private ArrayList<String> groupList;
-    private String currentUsername;
     private GroupFragment groupFragment;
 
 
@@ -42,7 +41,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.tvType.setText("Group Name:");
         holder.tvGroupName.setText(groupList.get(position));
 
 
@@ -53,24 +51,16 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         return groupList.size();
     }
 
-    public String getCurrentUsername() {
-        return currentUsername;
-    }
-
-    public void setCurrentUsername(String currentUsername) {
-        this.currentUsername = currentUsername;
-    }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         RecyclerView rv;
-        TextView tvGroupName, tvType;
+        TextView tvGroupName;
 
 
 
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            tvType = (TextView) itemView.findViewById(R.id.tvType);
             tvGroupName = (TextView) itemView.findViewById(R.id.tvGroupName);
         }
 

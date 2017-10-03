@@ -98,12 +98,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
 
-        Criteria mCritera = new Criteria();
-        String bestProvider = String.valueOf(locationManager.getBestProvider(mCritera, true));
-
         this.googleMap = googleMap;
+        initPosition();
         ((MainActivity)getActivity()).getController().setMarkers();
 
+    }
+
+    public void initPosition(){
+        Criteria mCritera = new Criteria();
+        String bestProvider = String.valueOf(locationManager.getBestProvider(mCritera, true));
         Location mLocation = locationManager.getLastKnownLocation(bestProvider);
         if(mLocation != null){
             startLat = mLocation.getLatitude();
@@ -112,7 +115,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLoc, 13));
             ((MainActivity)getActivity()).getController().setStartPosition(startLong, startLat);
         }
-
     }
 
 
@@ -120,6 +122,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
         for(int i = 0; i < memberList.size(); i++){
+//            if(memberList.get(i).getName().equals(((MainActivity)getActivity()).getController().getCurrentUsername())){
+//                continue;
+//            }
             Log.d("MAPFRAGMENT", "LATITUDE" + memberList.get(i).getLatitude());
             Log.d("MAPFRAGMENT", "LONGITUDE" + memberList.get(i).getLongitude());
             LatLng pos = new LatLng(parseFloat(memberList.get(i).getLatitude()), parseFloat(memberList.get(i).getLongitude()));
@@ -145,4 +150,5 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void setStartLong(double startLong) {
         this.startLong = startLong;
     }
+
 }

@@ -40,6 +40,7 @@ public class Controller {
     private Listener listener;
     private boolean bound = false;
     private ServerCommands serverCommands;
+    private Timer timer;
     private int currentFragment = 0;
 
     private double currentLat = 0;
@@ -97,8 +98,10 @@ public class Controller {
 
 
     public void onResume(){
-        Timer time = new Timer();
-        time.schedule(new TimerTask(),0, 20000);
+        if(timer == null){
+            timer = new Timer();
+            timer.schedule(new TimerTask(),0, 20000);
+        }
 
     }
 
@@ -106,9 +109,21 @@ public class Controller {
     public void setStartPosition(double startLong, double startLat) {
         this.currentLong = startLong;
         this.currentLat = startLat;
+        dataFragment.setCurrentLat(startLat);
+        dataFragment.setCurrentLong(startLong);
     }
 
     public void unRegisterFromGroup(String s) {
+    }
+
+    public void setShowOnMap(String groupname, String showOnMap, boolean b) {
+        ArrayList<Member> userList = dataFragment.getFromMap(groupname);
+        for(int i = 0; i < userList.size(); i++){
+            if(userList.get(i).getName().equals(showOnMap)){
+                userList.get(i).setShowOnMap(b);
+                Log.d("SHOWONMAP CHNAGED FOR", userList.get(i).toString() + b);
+            }
+        }
     }
 
     private class LocList implements android.location.LocationListener{
@@ -117,8 +132,8 @@ public class Controller {
         public void onLocationChanged(Location location) {
             currentLat = location.getLatitude();
             currentLong = location.getLongitude();
-            dataFragment.setCurrentLat(location.getLatitude());
-            dataFragment.setCurrentLong(location.getLongitude());
+            dataFragment.setCurrentLat(currentLat);
+            dataFragment.setCurrentLong(currentLong);
         }
 
         @Override
@@ -138,6 +153,7 @@ public class Controller {
     }
 
     public void onDestroy(){
+
         if(bound){
 
             if(mainActivity.isFinishing()){
@@ -147,6 +163,9 @@ public class Controller {
             mainActivity.unbindService(serviceConnection);
             listener.stopListener();
             bound = false;
+            timer.cancel();
+            timer.purge();
+            timer = null;
         }
 
     }
@@ -243,6 +262,10 @@ public class Controller {
         if(name.equals("") || group.equals("")){
             return "Empty field or missing field";
         }
+
+        if(dataFragment.getMyGroups().size() != 0){
+            return "You are already registered!";
+        }
         currentUsername = name;
         dataFragment.setCurrentUsername(name);
         dataFragment.setCurrentGroup(group);
@@ -272,7 +295,7 @@ public class Controller {
 
 
     public void setMarkers() {
-        mapFragment.placeMarker(dataFragment.getCurrentPositionList());
+        mapFragment.placeMarker(gatherAllMembers());
     }
 
     public void setGroupFragment(String groupName) {
@@ -369,10 +392,11 @@ public class Controller {
     }
 
     public void setPosition(){
-        if(connected != false && !dataFragment.getCurrentUsername().equals("")){
+        if(connected != false && !dataFragment.getCurrentUsername().equals("") && commService != null){
             ArrayList<String> temp = dataFragment.getMyGroups();
             for(int i = 0; i < temp.size(); i++) {
-                JSONObject sendObject = serverCommands.setPosition(dataFragment.getFromIdMap(temp.get(i)), String.valueOf(currentLat), String.valueOf(currentLong));
+                JSONObject sendObject = serverCommands.setPosition(dataFragment.getFromIdMap(temp.get(i)),
+                        String.valueOf(dataFragment.getCurrentLong()), String.valueOf(dataFragment.getCurrentLat()));
                 commService.send(sendObject);
             }
         }
@@ -464,26 +488,36 @@ public class Controller {
 
                     ArrayList<Member> tempList = dataFragment.getFromMap(group);
 
-                    if(tempList.size() != 0) {
-                        if (tempList.size() < positionList.size()) {
-                            for (int i = 0; i < positionList.size(); i++) {
-                                for (int j = 0; j < tempList.size(); j++) {
-                                    if (positionList.get(j).getName().equals(tempList.get(j).getName())) {
-                                        positionList.get(j).setShowOnMap(tempList.get(j).isShowOnMap());
-                                    }
-                                }
-                            }
-                        } else {
-                            for (int i = 0; i < tempList.size(); i++) {
-                                for (int j = 0; j < positionList.size(); j++) {
-                                    if (positionList.get(j).getName().equals(tempList.get(j).getName())) {
-                                        positionList.get(j).setShowOnMap(tempList.get(j).isShowOnMap());
-                                    }
-                                }
-                            }
+                    if(tempList.size() != 0){
+                        for(Member m: tempList){
 
+                            for(Member m1: positionList){
+                                if(m1.getName().equals(m.getName())){
+                                    m1.setShowOnMap(m.isShowOnMap());
+                                }
+                            }
                         }
                     }
+//                    if(tempList.size() != 0) {
+//                        if (tempList.size() < positionList.size()) {
+//                            for (int i = 0; i < positionList.size(); i++) {
+//                                for (int j = 0; j < tempList.size(); j++) {
+//                                    if (positionList.get(j).getName().equals(tempList.get(j).getName())) {
+//                                        positionList.get(j).setShowOnMap(tempList.get(j).isShowOnMap());
+//                                    }
+//                                }
+//                            }
+//                        } else {
+//                            for (int i = 0; i < tempList.size(); i++) {
+//                                for (int j = 0; j < positionList.size(); j++) {
+//                                    if (positionList.get(j).getName().equals(tempList.get(j).getName())) {
+//                                        positionList.get(j).setShowOnMap(tempList.get(j).isShowOnMap());
+//                                    }
+//                                }
+//                            }
+//
+//                        }
+//                    }
 
                     dataFragment.addToMap(group, positionList);
 
@@ -501,6 +535,10 @@ public class Controller {
 
         }
 
+    }
+
+    public String getCurrentUsername(){
+        return dataFragment.getCurrentUsername();
     }
 
 
