@@ -24,7 +24,14 @@ public class ServerCommands {
     public static final String _ID = "id";
     public static final String _LONGITUDE = "longitude";
     public static final String _LATITUDE = "latitude";
-    public static final String _EXCEPTION = "exception" ;
+    public static final String _EXCEPTION = "exception";
+    public static final String _TEXTCHAT = "textchat";
+    public static final String _TEXT = "text";
+    public static final String _IMAGE_CHAT = "imagechat";
+    public static final String _UPLOAD = "upload";
+    public static final String _IMAGEID = "imageid";
+    public static final String _PORT = "port";
+    public static final String _IP = "195.178.227.53";
 
     public ServerCommands(){
 
@@ -90,6 +97,34 @@ public class ServerCommands {
         }
 
         return newObject;
+    }
+
+    public JSONObject textMessage(String message, String id){
+        JSONObject textObject = new JSONObject();
+        try{
+            textObject.put(_TYPE, _TEXTCHAT);
+            textObject.put(_ID, id);
+            textObject.put(_TEXT, message);
+        }catch(JSONException e){
+
+        }
+
+        return textObject;
+    }
+
+    public JSONObject sendImage(String id, String text, String longitude, String latitude){
+        JSONObject temp = new JSONObject();
+        try{
+            temp.put(_TYPE, _IMAGE_CHAT);
+            temp.put(_ID, id);
+            temp.put(_TEXT, text);
+            temp.put(_LONGITUDE, longitude);
+            temp.put(_LATITUDE, latitude);
+        }catch (JSONException e){
+
+        }
+
+        return temp;
     }
 
 }

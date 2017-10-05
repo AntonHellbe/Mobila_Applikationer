@@ -13,4 +13,12 @@
     <string name="Group_members">Group members</string>
     <string name="deregister">Deregister</string>
     <string name="memberName">Member name:</string>
+    <string name="sendmsg">Send</string>
+    <string name="english">English</string>
+    <string name="svenska">Svenska</string>
+    <string name="map">Map</string>
+    <string name="Members">Members</string>
+    <string name="Groups">Groups</string>
+    <string name="Chat">Chat</string>
+    <string name="registerMenu">Register</string>
 </resources>

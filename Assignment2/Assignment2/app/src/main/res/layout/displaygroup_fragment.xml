@@ -2,40 +2,64 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="40dp" >
+    android:layout_height="match_parent">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:id="@+id/tvGroupname"
-        />
+        android:text="GROUP MEMBERS"
+        android:textSize="20sp"
+        android:textAlignment="center"/>
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tvGroupMembers"
-        android:layout_marginBottom="20dp"/>
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rvGroupView"
+            android:layout_alignParentTop="true"
+            android:layout_above="@+id/btnBack">
+
+        </android.support.v7.widget.RecyclerView>
+
+
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnBack"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btnRegister"
+        android:layout_marginRight="10dp"
         android:text="@string/Back"/>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnRegister"
+        android:layout_toLeftOf="@+id/btnDeRegister"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="10dp"
         android:text="@string/register"/>
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnDeRegister"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:text="@string/deregister"/>
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvGroup"
+        android:visibility="invisible"/>
 
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.antonhellbegmail.assignment2;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ public class GroupFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager lm;
     private GroupAdapter groupAdapter;
+    private SwipeRefreshLayout srlGroup;
 
     @Nullable
     @Override
@@ -36,6 +38,7 @@ public class GroupFragment extends Fragment {
         lm = new LinearLayoutManager(getActivity());
         groupAdapter = new GroupAdapter(this);
         recyclerView.setLayoutManager(lm);
+        srlGroup = (SwipeRefreshLayout) rootView.findViewById(R.id.srlGroups);
     }
 
     public void setAdapter(GroupAdapter groupAdapter){
@@ -51,6 +54,14 @@ public class GroupFragment extends Fragment {
     public void updateGroups(ArrayList<String> groupList){
         ((GroupAdapter)recyclerView.getAdapter()).setGroups(groupList);
         recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    private class RefreshListener implements SwipeRefreshLayout.OnRefreshListener{
+
+        @Override
+        public void onRefresh() {
+//            ((MainActivity)getActivity()).getController()
+        }
     }
 
 

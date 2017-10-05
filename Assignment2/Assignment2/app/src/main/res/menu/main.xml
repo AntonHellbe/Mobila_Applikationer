@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/sv"
+        android:orderInCategory="200"
+        android:title="@string/svenska"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/en"
+        android:orderInCategory="200"
+        android:title="@string/english"
+        app:showAsAction="never"
+        />
+
+
 </menu>

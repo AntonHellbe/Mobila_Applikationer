@@ -5,24 +5,24 @@
         <item
             android:id="@+id/map"
             android:icon="@drawable/google_maps"
-            android:title="Map" />
+            android:title="@string/map" />
         <item
             android:id="@+id/members"
             android:icon="@drawable/members"
-            android:title="Members" />
+            android:title="@string/Members" />
         <item
             android:id="@+id/groups"
             android:icon="@drawable/groups"
-            android:title="Groups" />
+            android:title="@string/Groups" />
         <item
             android:id="@+id/chat"
             android:icon="@drawable/chat"
-            android:title="Chat"
+            android:title="@string/Chat"
             />
         <item
             android:id="@+id/register"
             android:icon="@drawable/register"
-            android:title="Register"
+            android:title="@string/registerMenu"
             />
         <!--<item-->
             <!--android:id="@+id/nav_manage"-->

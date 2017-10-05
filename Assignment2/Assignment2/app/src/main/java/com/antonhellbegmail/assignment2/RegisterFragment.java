@@ -24,6 +24,12 @@ public class RegisterFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        ((MainActivity)getActivity()).getController().setRegisterState();
+        super.onResume();
+    }
+
     private void registerListeners() {
         btnRegister.setOnClickListener(new ButtonListener());
     }
@@ -41,9 +47,25 @@ public class RegisterFragment extends Fragment {
             String result;
             switch(view.getId()){
                 case R.id.btnRegister:
-                    result = ((MainActivity)getActivity()).getController().register(etUsername.getText().toString(), etGroup.getText().toString());
-                    Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
+                    try {
+                        result = ((MainActivity) getActivity()).getController().register(etUsername.getText().toString(), etGroup.getText().toString());
+                        Toast.makeText(getActivity(), result, Toast.LENGTH_SHORT).show();
+                    }catch(Exception e){
+
+                    }
             }
         }
+    }
+
+    public void setBtnRegister(Boolean isEnabled){
+        btnRegister.setEnabled(isEnabled);
+    }
+
+    public void clearTvUsername(){
+        etUsername.getText().clear();
+    }
+
+    public void clearGroupName(){
+        etGroup.getText().clear();
     }
 }

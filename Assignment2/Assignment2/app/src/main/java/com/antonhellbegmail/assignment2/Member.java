@@ -1,6 +1,7 @@
 package com.antonhellbegmail.assignment2;
 
 import static com.antonhellbegmail.assignment2.R.string.group;
+import static com.antonhellbegmail.assignment2.R.string.memberName;
 
 /**
  * Created by Anton on 2017-09-29.
@@ -78,5 +79,19 @@ public class Member {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    @Override
+    public int hashCode() {
+        return memberName;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Member mem = (Member) obj;
+        if(mem.getName().equals(this.name)){
+            return true;
+        }
+        return false;
     }
 }

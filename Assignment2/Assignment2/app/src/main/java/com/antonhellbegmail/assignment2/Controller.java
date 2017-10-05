@@ -4,6 +4,8 @@ import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -15,10 +17,12 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class Controller {
@@ -30,8 +34,11 @@ public class Controller {
     private RegisterFragment registerFragment;
     private MapFragment mapFragment;
     private DisplayGroupFragment displayFrag;
+    private ChatFragment chatFragment;
     private DataFragment dataFragment;
     private CommService commService;
+
+    private Bitmap bitMapTest;
 
 
     private String currentUsername = "";
@@ -62,6 +69,7 @@ public class Controller {
         this.memberFragment = new MemberFragment();
         this.registerFragment = new RegisterFragment();
         this.displayFrag = new DisplayGroupFragment();
+        this.chatFragment = new ChatFragment();
 
 
         serverCommands = new ServerCommands();
@@ -98,9 +106,10 @@ public class Controller {
 
 
     public void onResume(){
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000, 0, locationListener);
         if(timer == null){
             timer = new Timer();
-            timer.schedule(new TimerTask(),0, 20000);
+            timer.schedule(new TimerTask(),0, 30000);
         }
 
     }
@@ -114,6 +123,19 @@ public class Controller {
     }
 
     public void unRegisterFromGroup(String s) {
+        String id = dataFragment.getFromIdMap(s);
+        if(id == null){
+            return;
+        }
+        JSONObject deRegistration = serverCommands.deRegistration(id);
+        dataFragment.removeFromIdMap(s);
+        dataFragment.removeGroup(s);
+        commService.send(deRegistration);
+        displayFrag.setBtnDeRegister(false);
+        displayFrag.setBtnRegister(true);
+        JSONObject updatedGroup = serverCommands.groupMembers(dataFragment.getClickedGroup());
+        commService.send(updatedGroup);
+        Toast.makeText(displayFrag.getActivity(), "Deregistration succesfull", Toast.LENGTH_SHORT).show();
     }
 
     public void setShowOnMap(String groupname, String showOnMap, boolean b) {
@@ -126,6 +148,89 @@ public class Controller {
         }
     }
 
+    public void sendMessage(String text) {
+        if(dataFragment.getMyGroups().size() == 0){
+            return;
+        }
+        String id = dataFragment.getFromIdMap(dataFragment.getActiveChatGroup());
+        JSONObject temp = serverCommands.textMessage(text, id);
+        commService.send(temp);
+        chatFragment.clearMessageField();
+
+    }
+
+    public void postMessages() {
+        ArrayList<String> myGroups = dataFragment.getMyGroups();
+        chatFragment.setSpinnerAdapter(myGroups);
+        ArrayList<TextMessage> filteredMessages = new ArrayList<>();
+        ArrayList<TextMessage> messageList = dataFragment.getMessageList();
+        for(TextMessage m: messageList){
+            if(m.getGroup().equals(dataFragment.getActiveChatGroup())){
+                filteredMessages.add(m);
+            }
+        }
+        chatFragment.setData(filteredMessages);
+    }
+
+    public void setRegisterState() {
+        registerFragment.setBtnRegister(dataFragment.isNotRegistered());
+    }
+
+    public void compress(String pathToPicture) {
+        BitmapFactory.Options bmpOptions = new BitmapFactory.Options();
+
+        bmpOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(pathToPicture, bmpOptions);
+
+        int photoW = bmpOptions.outWidth;
+        int photoH = bmpOptions.outHeight;
+
+        int scaleFactor = Math.min(photoW / 50, photoH / 50);
+
+        bmpOptions.inJustDecodeBounds = false;
+        bmpOptions.inSampleSize = scaleFactor;
+        Bitmap bitmap = BitmapFactory.decodeFile(pathToPicture, bmpOptions);
+
+        bitMapTest = bitmap;
+
+        JSONObject temp = serverCommands.sendImage(dataFragment.getFromIdMap(dataFragment.getActiveChatGroup()),"TEXT",
+                String.valueOf(dataFragment.getCurrentLong()), String.valueOf(dataFragment.getCurrentLat()));
+        commService.send(temp);
+
+
+    }
+
+    private byte[] bitmapToByte(Bitmap bitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
+    }
+
+    public void updateChatGroup(String group) {
+        dataFragment.setActiveChatGroup(group);
+        ArrayList<TextMessage> filteredMessages = new ArrayList<>();
+        ArrayList<TextMessage> messageList = dataFragment.getMessageList();
+        for(TextMessage m: messageList){
+            if(m.getGroup().equals(dataFragment.getActiveChatGroup())){
+                filteredMessages.add(m);
+            }
+        }
+        chatFragment.setData(filteredMessages);
+
+
+    }
+
+    public void startCamera() {
+        mainActivity.startCameraActivity(2);
+    }
+
+    public void onPause() {
+        if(mainActivity.isFinishing()){
+            mainActivity.getFragmentManager().beginTransaction().remove(dataFragment).commit();
+        }
+    }
+
     private class LocList implements android.location.LocationListener{
 
         @Override
@@ -134,6 +239,7 @@ public class Controller {
             currentLong = location.getLongitude();
             dataFragment.setCurrentLat(currentLat);
             dataFragment.setCurrentLong(currentLong);
+            Log.d("POSITION CHANGED", location.getLatitude() + " " + location.getLongitude());
         }
 
         @Override
@@ -155,9 +261,8 @@ public class Controller {
     public void onDestroy(){
 
         if(bound){
-
             if(mainActivity.isFinishing()){
-                mainActivity.getFragmentManager().beginTransaction().remove(dataFragment).commit();
+                commService.disconnect();
                 commService.stopService(new Intent(mainActivity, CommService.class));
             }
             mainActivity.unbindService(serviceConnection);
@@ -199,6 +304,9 @@ public class Controller {
             case R.id.register:
                 currentFragment = 3;
                 break;
+            case R.id.chat:
+                currentFragment = 4;
+                break;
 
         }
         dataFragment.setCurrentFragment(currentFragment);
@@ -210,15 +318,23 @@ public class Controller {
         switch(id){
             case 0:
                 mainActivity.setFragment(mapFragment, true);
+                dataFragment.setChatActive(false);
                 break;
             case 1:
                 mainActivity.setFragment(memberFragment, true);
+                dataFragment.setChatActive(false);
                 break;
             case 2:
                 mainActivity.setFragment(groupFragment, true);
+                dataFragment.setChatActive(false);
                 break;
             case 3:
                 mainActivity.setFragment(registerFragment, true);
+                dataFragment.setChatActive(false);
+                break;
+            case 4:
+                mainActivity.setFragment(chatFragment, true);
+                dataFragment.setChatActive(true);
                 break;
         }
     }
@@ -232,11 +348,11 @@ public class Controller {
 
 
     public void setMemberAdapter(){
-        JSONObject membersObject = serverCommands.groupMembers(dataFragment.getCurrentGroup());
-        Log.d("CONTROLLER", "CALLING" + commService);
-        if(commService != null){
-            commService.send(membersObject);
-        }
+//        JSONObject membersObject = serverCommands.groupMembers(dataFragment.getCurrentGroup());
+//        Log.d("CONTROLLER", "CALLING" + commService);
+//        if(commService != null){
+//            commService.send(membersObject);
+//        }
 
         memberFragment.setData(gatherAllMembers());
 
@@ -245,14 +361,17 @@ public class Controller {
     public ArrayList<Member> gatherAllMembers(){
 
         ArrayList<String> myGroups = dataFragment.getMyGroups();
+        HashSet<Member> hashSet = new HashSet<>();
         ArrayList<Member> allMembers = new ArrayList<>();
         for(int i = 0; i < myGroups.size(); i++){
-            Log.v("CONTROLLER FIRST GROUP", myGroups.get(i));
             ArrayList<Member> tempList = dataFragment.getFromMap(myGroups.get(i));
 
             for(int j = 0; j < tempList.size(); j++){
-                allMembers.add(tempList.get(j));
+                hashSet.add(tempList.get(j));
             }
+        }
+        for(Member m: hashSet){
+            allMembers.add(m);
         }
 
         return allMembers;
@@ -268,7 +387,13 @@ public class Controller {
         }
         currentUsername = name;
         dataFragment.setCurrentUsername(name);
-        dataFragment.setCurrentGroup(group);
+        dataFragment.setNotRegistered(false);
+        dataFragment.setActiveChatGroup(group);
+        mainActivity.setUsername(currentUsername);
+        registerFragment.setBtnRegister(false);
+        registerFragment.clearGroupName();
+        registerFragment.clearTvUsername();
+
 
         JSONObject registerObject = serverCommands.register(group, name);
         commService.send(registerObject);
@@ -283,6 +408,12 @@ public class Controller {
         }
         JSONObject registerObject = serverCommands.register(group, dataFragment.getCurrentUsername());
         commService.send(registerObject);
+
+        JSONObject updatedGroup = serverCommands.groupMembers(dataFragment.getClickedGroup());
+        commService.send(updatedGroup);
+        displayFrag.setBtnRegister(false);
+        displayFrag.setBtnDeRegister(true);
+        Toast.makeText(displayFrag.getActivity(), "Registration Successfull!", Toast.LENGTH_SHORT).show();
         return "";
     }
 
@@ -290,12 +421,13 @@ public class Controller {
     public void rescueMission() {
         currentFragment = dataFragment.getCurrentFragment();
         currentUsername = dataFragment.getCurrentUsername();
+        mainActivity.setUsername(currentUsername);
         switchFragment(currentFragment);
     }
 
 
     public void setMarkers() {
-        mapFragment.placeMarker(gatherAllMembers());
+        mapFragment.placeMarker(gatherAllMembers(), dataFragment.getMessageList());
     }
 
     public void setGroupFragment(String groupName) {
@@ -358,6 +490,10 @@ public class Controller {
         public void onServiceDisconnected(ComponentName componentName) {
             bound = false;
         }
+    }
+
+    public DataFragment getDataFragment(){
+        return this.dataFragment;
     }
 
     private class Listener extends Thread{
@@ -426,7 +562,7 @@ public class Controller {
 
     public void recievedData(String message){
         JSONObject recievedObject;
-        String type, id, group;
+        String type, id, group, text, mem, imageId, port, longi, lati;
         JSONArray arr;
         ArrayList<Member> memberList;
         ArrayList<String> groupList;
@@ -444,19 +580,30 @@ public class Controller {
                     dataFragment.addToIdMap(group, id);
                     dataFragment.addGroup(group);
                     dataFragment.addToMap(group, new ArrayList<Member>());
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000, 0, locationListener);
                     break;
 
                 case ServerCommands._MEMBERS:
                     arr = recievedObject.getJSONArray(ServerCommands._MEMBERS);
+                    group = recievedObject.getString(ServerCommands._GROUP);
                     memberList = new ArrayList<>();
                     JSONObject member;
                     for(int i = 0; i < arr.length(); i++){
                         member = arr.getJSONObject(i);
                         memberList.add(new Member(member.getString(ServerCommands._MEMBER)));
                     }
+                    ArrayList<String> myGroups = dataFragment.getMyGroups();
+
+                    displayFrag.setBtnDeRegister(false);
+                    displayFrag.setBtnRegister(true);
+                    for(String s: myGroups){
+                        if(s.equals(group)){
+                            displayFrag.setBtnRegister(false);
+                            displayFrag.setBtnDeRegister(true);
+                        }
+                    }
                     dataFragment.setClickedGroup(recievedObject.getString(ServerCommands._GROUP));
-                    dataFragment.setClickedGroupList(memberList);
+                    displayFrag.setData(memberList);
+                    displayFrag.setTvGroupName(dataFragment.getClickedGroup());
                     break;
 
                 case ServerCommands._GROUPS:
@@ -490,7 +637,6 @@ public class Controller {
 
                     if(tempList.size() != 0){
                         for(Member m: tempList){
-
                             for(Member m1: positionList){
                                 if(m1.getName().equals(m.getName())){
                                     m1.setShowOnMap(m.isShowOnMap());
@@ -498,30 +644,61 @@ public class Controller {
                             }
                         }
                     }
-//                    if(tempList.size() != 0) {
-//                        if (tempList.size() < positionList.size()) {
-//                            for (int i = 0; i < positionList.size(); i++) {
-//                                for (int j = 0; j < tempList.size(); j++) {
-//                                    if (positionList.get(j).getName().equals(tempList.get(j).getName())) {
-//                                        positionList.get(j).setShowOnMap(tempList.get(j).isShowOnMap());
-//                                    }
-//                                }
-//                            }
-//                        } else {
-//                            for (int i = 0; i < tempList.size(); i++) {
-//                                for (int j = 0; j < positionList.size(); j++) {
-//                                    if (positionList.get(j).getName().equals(tempList.get(j).getName())) {
-//                                        positionList.get(j).setShowOnMap(tempList.get(j).isShowOnMap());
-//                                    }
-//                                }
-//                            }
-//
-//                        }
-//                    }
-
                     dataFragment.addToMap(group, positionList);
 
                     break;
+
+                case ServerCommands._TEXTCHAT:
+                    group = recievedObject.getString(serverCommands._GROUP);
+                    text = recievedObject.getString(serverCommands._TEXT);
+                    mem = recievedObject.getString(serverCommands._MEMBER);
+                    TextMessage temp = new TextMessage(group,mem, text);
+                    dataFragment.addTextMessage(temp);
+                    if(dataFragment.getChatActive() && group.equals(dataFragment.getActiveChatGroup())) {
+                        ArrayList<TextMessage> newMessages = new ArrayList<>();
+                        ArrayList<TextMessage> list = dataFragment.getMessageList();
+                        for(TextMessage m: list){
+                            if(m.getGroup().equals(group)){
+                                newMessages.add(m);
+                            }
+                        }
+                        chatFragment.setData(newMessages);
+                    }
+                    break;
+
+                case ServerCommands._UPLOAD:
+                    imageId = recievedObject.getString(ServerCommands._IMAGEID);
+                    port = recievedObject.getString(ServerCommands._PORT);
+                    dataFragment.addToImageMap(imageId, bitmapToByte(bitMapTest));
+                    new SendImageTask(bitMapTest).execute(imageId, port, ServerCommands._IP);
+
+                    break;
+
+                case ServerCommands._IMAGE_CHAT:
+                    group = recievedObject.getString(ServerCommands._GROUP);
+                    mem = recievedObject.getString(ServerCommands._MEMBER);
+                    text = recievedObject.getString(ServerCommands._TEXT);
+                    longi = recievedObject.getString(ServerCommands._LONGITUDE);
+                    lati = recievedObject.getString(ServerCommands._LATITUDE);
+                    imageId = recievedObject.getString(ServerCommands._IMAGEID);
+                    port = recievedObject.getString(ServerCommands._PORT);
+                    Log.d("RECIEVEDIMAGECHAT", imageId);
+                    TextMessage imMessage = new TextMessage(group, mem, text, port, imageId, longi, lati);
+                    dataFragment.addTextMessage(imMessage);
+                    if(dataFragment.getChatActive() && group.equals(dataFragment.getActiveChatGroup())) {
+                        ArrayList<TextMessage> newMessages = new ArrayList<>();
+                        ArrayList<TextMessage> list = dataFragment.getMessageList();
+                        for(TextMessage m: list){
+                            if(m.getGroup().equals(group)){
+                                newMessages.add(m);
+                            }
+                        }
+                        chatFragment.setData(newMessages);
+                    }
+
+                    break;
+
+
 
                 case ServerCommands._EXCEPTION:
                     JSONObject json = serverCommands.register(dataFragment.getCurrentUsername(), dataFragment.getCurrentGroup());

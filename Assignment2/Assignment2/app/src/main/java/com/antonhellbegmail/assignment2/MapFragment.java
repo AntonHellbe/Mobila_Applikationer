@@ -2,7 +2,10 @@ package com.antonhellbegmail.assignment2;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.app.Notification;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
 import android.location.Criteria;
 import android.location.Location;
@@ -23,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -118,19 +122,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public void placeMarker(ArrayList<Member> memberList){
-
-
-        for(int i = 0; i < memberList.size(); i++){
-//            if(memberList.get(i).getName().equals(((MainActivity)getActivity()).getController().getCurrentUsername())){
-//                continue;
-//            }
-            Log.d("MAPFRAGMENT", "LATITUDE" + memberList.get(i).getLatitude());
-            Log.d("MAPFRAGMENT", "LONGITUDE" + memberList.get(i).getLongitude());
-            LatLng pos = new LatLng(parseFloat(memberList.get(i).getLatitude()), parseFloat(memberList.get(i).getLongitude()));
-            MarkerOptions mark = new MarkerOptions().position(pos).title(memberList.get(i).getName());
+    public void placeMarker(ArrayList<Member> memberList, ArrayList<TextMessage> messages){
+        int i = 0;
+        for(Member m: memberList){
+            if(!m.isShowOnMap()){
+                continue;
+            }
+            LatLng pos = new LatLng(parseFloat(m.getLatitude()), parseFloat(m.getLongitude()));
+            MarkerOptions mark = new MarkerOptions().position(pos).title(m.getName());
             mark.icon(BitmapDescriptorFactory.defaultMarker(markerArray[i % markerArray.length]));
             googleMap.addMarker(mark);
+            i++;
+        }
+
+        for(TextMessage m: messages){
+            Log.v("GOT FOLLOWING M", m.getImageId());
+            if(!(m.getImageId().equals(""))){
+                LatLng pos = new LatLng(parseFloat(m.getLatitude()), parseFloat(m.getLongitude()));
+                MarkerOptions mark = new MarkerOptions().position(pos).title(m.getMember());
+                byte[] temp = ((MainActivity)getActivity()).getController().getDataFragment().getFromImageMap(m.getImageId());
+                Log.v("BYTEARRAY", "" + temp);
+                Bitmap picture = BitmapFactory.decodeByteArray(temp, 0, temp.length);
+                mark.icon(BitmapDescriptorFactory.fromBitmap(picture));
+                googleMap.addMarker(mark);
+            }
         }
 
     }

@@ -16,25 +16,29 @@ import java.util.HashMap;
 
 public class DataFragment extends Fragment {
 
-    private Boolean bound;
+    private Boolean chatActive = false;
     private Boolean connected = false;
     private Boolean serviceExist = false;
     private String currentUsername = "";
     private String currentGroup = "";
     private int currentFragment = 0;
-    private String currentId = "";
+    private boolean notRegistered = true;
     private double currentLat;
     private double currentLong;
     private String clickedGroup = "";
+    private String activeChatGroup = "";
+    private String currentLocale = "";
 
 
     private HashMap<String, ArrayList<Member>> membermap = new HashMap<>();
     private HashMap<String, String> idMap = new HashMap<>();
+    private HashMap<String, byte[]> imageMap = new HashMap<>();
 
     private ArrayList<String> myGroups = new ArrayList<>();
     private ArrayList<Member> currentPositionList = new ArrayList<>();
     private ArrayList<String> groupList = new ArrayList<>();
     private ArrayList<Member> clickedGroupList = new ArrayList<>();
+    private ArrayList<TextMessage> messageList = new ArrayList<>();
 
 
     @Override
@@ -58,13 +62,6 @@ public class DataFragment extends Fragment {
         this.connected = connected;
     }
 
-    public Boolean getBound() {
-        return bound;
-    }
-
-    public void setBound(Boolean bound) {
-        this.bound = bound;
-    }
 
     public Boolean getServiceExist() {
         return serviceExist;
@@ -88,22 +85,6 @@ public class DataFragment extends Fragment {
 
     public void setCurrentFragment(int currentFragment) {
         this.currentFragment = currentFragment;
-    }
-
-    public String getCurrentId() {
-        return currentId;
-    }
-
-    public void setCurrentId(String currentId) {
-        this.currentId = currentId;
-    }
-
-    public ArrayList<Member> getCurrentPositionList() {
-        return currentPositionList;
-    }
-
-    public void setCurrentPositionList(ArrayList<Member> currentPositionList) {
-        this.currentPositionList = currentPositionList;
     }
 
 
@@ -132,6 +113,7 @@ public class DataFragment extends Fragment {
     }
 
     public void addToMap(String group, ArrayList<Member> memberList){
+
         membermap.put(group, memberList);
 
     }
@@ -178,5 +160,69 @@ public class DataFragment extends Fragment {
 
     public String getFromIdMap(String groupname){
         return idMap.get(groupname);
+    }
+
+    public void addTextMessage(TextMessage txtMessage){
+        for(String group: myGroups){
+            if(group.equals(txtMessage.getGroup())){
+                messageList.add(txtMessage);
+            }
+        }
+
+    }
+
+    public ArrayList<TextMessage> getMessageList(){
+        return this.messageList;
+    }
+
+    public boolean isNotRegistered() {
+        return notRegistered;
+    }
+
+    public void setNotRegistered(boolean notRegistered) {
+        this.notRegistered = notRegistered;
+    }
+
+    public Boolean getChatActive() {
+        return chatActive;
+    }
+
+    public void setChatActive(Boolean chatActive) {
+        this.chatActive = chatActive;
+    }
+
+    public String getActiveChatGroup() {
+        return activeChatGroup;
+    }
+
+    public void setActiveChatGroup(String activeChatGroup) {
+        this.activeChatGroup = activeChatGroup;
+    }
+
+    public void addToImageMap(String key, byte[] arr){
+        imageMap.put(key, arr);
+    }
+
+    public byte[] getFromImageMap(String key){
+        return imageMap.get(key);
+    }
+
+    public void removeFromIdMap(String group){
+        idMap.remove(group);
+    }
+    public void removeGroup(String group){
+        for(String s: myGroups){
+            if(s.equals(group)){
+                myGroups.remove(s);
+            }
+        }
+    }
+
+    public String getCurrentLocale() {
+        return currentLocale;
+    }
+
+    public void setCurrentLocale(String currentLocale) {
+        this.currentLocale = currentLocale;
     }
 }

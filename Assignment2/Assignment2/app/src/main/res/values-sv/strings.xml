@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Assignment2</string>
+    <string name="Back">Tillbaka</string>
+    <string name="Group_members">Gruppmedlemmar</string>
+    <string name="action_settings">Inställningar</string>
+    <string name="deregister">Avregistrera</string>
+    <string name="group">Grupp</string>
+    <string name="google_maps_key">AIzaSyBuOuyv4Sv_m1HRGZ_rhRtl3Ss3bD1KaQk</string>
+    <string name="group_name">Grupp namn:</string>
+    <string name="memberName">Medlems namn:</string>
+    <string name="name">Namn</string>
+    <string name="navigation_drawer_close">Stäng navigation vy</string>
+    <string name="navigation_drawer_open">Öppna Navigations vy</string>
+    <string name="register">Registrera</string>
+    <string name="sendmsg">Skicka</string>
+    <string name="svenska">Svenska</string>
+    <string name="english">Engelska</string>
+    <string name="registerMenu">Registrera</string>
+    <string name="map">Karta</string>
+    <string name="Members">Medlemmar</string>
+    <string name="Groups">Grupper</string>
+    <string name="Chat">Chatt</string>
+</resources>
