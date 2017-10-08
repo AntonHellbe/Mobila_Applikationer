@@ -21,4 +21,6 @@
     <string name="Groups">Groups</string>
     <string name="Chat">Chat</string>
     <string name="registerMenu">Register</string>
+    <string name="addGroup">Add group</string>
+    <string name="newgroup">New group</string>
 </resources>

@@ -21,4 +21,6 @@
     <string name="Members">Medlemmar</string>
     <string name="Groups">Grupper</string>
     <string name="Chat">Chatt</string>
+    <string name="addGroup">Lägg till grupp</string>
+    <string name="newgroup">Ny grupp</string>
 </resources>

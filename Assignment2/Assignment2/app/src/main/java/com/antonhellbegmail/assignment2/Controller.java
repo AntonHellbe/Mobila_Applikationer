@@ -231,6 +231,23 @@ public class Controller {
         }
     }
 
+    public void addNewGroup(String groupName) {
+        if(currentUsername.equals("") || groupName.equals("")){
+            Toast.makeText(groupFragment.getActivity(), "Error occured when trying to add group", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        JSONObject registerObject = serverCommands.register(groupName, dataFragment.getCurrentUsername());
+        commService.send(registerObject);
+
+        JSONObject refreshObject = serverCommands.currentGroups();
+        commService.send(refreshObject);
+    }
+
+    public void refreshGroups() {
+        JSONObject refreshObject = serverCommands.currentGroups();
+        commService.send(refreshObject);
+    }
+
     private class LocList implements android.location.LocationListener{
 
         @Override
@@ -348,12 +365,6 @@ public class Controller {
 
 
     public void setMemberAdapter(){
-//        JSONObject membersObject = serverCommands.groupMembers(dataFragment.getCurrentGroup());
-//        Log.d("CONTROLLER", "CALLING" + commService);
-//        if(commService != null){
-//            commService.send(membersObject);
-//        }
-
         memberFragment.setData(gatherAllMembers());
 
     }
