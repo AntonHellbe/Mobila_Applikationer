@@ -29,6 +29,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -136,12 +137,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         for(TextMessage m: messages){
-            Log.v("GOT FOLLOWING M", m.getImageId());
             if(!(m.getImageId().equals(""))){
                 LatLng pos = new LatLng(parseFloat(m.getLatitude()), parseFloat(m.getLongitude()));
                 MarkerOptions mark = new MarkerOptions().position(pos).title(m.getMember());
                 byte[] temp = ((MainActivity)getActivity()).getController().getDataFragment().getFromImageMap(m.getImageId());
-                Log.v("BYTEARRAY", "" + temp);
                 Bitmap picture = BitmapFactory.decodeByteArray(temp, 0, temp.length);
                 mark.icon(BitmapDescriptorFactory.fromBitmap(picture));
                 googleMap.addMarker(mark);
@@ -164,6 +163,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public void setStartLong(double startLong) {
         this.startLong = startLong;
+    }
+
+    private class MarkerClicked implements GoogleMap.OnMarkerClickListener{
+
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            return false;
+        }
     }
 
 }

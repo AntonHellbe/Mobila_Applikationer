@@ -587,7 +587,6 @@ public class Controller {
                 case ServerCommands._REGISTER:
                     group = recievedObject.getString(ServerCommands._GROUP);
                     id = recievedObject.getString(ServerCommands._ID);
-                    Log.d("RECIEVED ID : ", id);
                     dataFragment.addToIdMap(group, id);
                     dataFragment.addGroup(group);
                     dataFragment.addToMap(group, new ArrayList<Member>());
@@ -693,7 +692,6 @@ public class Controller {
                     lati = recievedObject.getString(ServerCommands._LATITUDE);
                     imageId = recievedObject.getString(ServerCommands._IMAGEID);
                     port = recievedObject.getString(ServerCommands._PORT);
-                    Log.d("RECIEVEDIMAGECHAT", imageId);
                     TextMessage imMessage = new TextMessage(group, mem, text, port, imageId, longi, lati);
                     dataFragment.addTextMessage(imMessage);
                     if(dataFragment.getChatActive() && group.equals(dataFragment.getActiveChatGroup())) {
