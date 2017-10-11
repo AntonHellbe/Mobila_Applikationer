@@ -1,15 +1,20 @@
 package com.antonhellbegmail.assignment2;
 
+import android.*;
+import android.Manifest;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -106,10 +111,17 @@ public class Controller {
 
 
     public void onResume(){
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000, 0, locationListener);
-        if(timer == null){
-            timer = new Timer();
-            timer.schedule(new TimerTask(),0, 30000);
+        if (ContextCompat.checkSelfPermission(mainActivity, android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_DENIED &&
+        ContextCompat.checkSelfPermission(mainActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_DENIED &&
+        ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.INTERNET) ==
+                PackageManager.PERMISSION_DENIED){
+            ActivityCompat.requestPermissions(mainActivity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET}, 0);}
+        else {
+            if (timer == null) {
+                timer = new Timer();
+                timer.schedule(new TimerTask(), 0, 30000);
+            }
         }
 
     }
