@@ -28,19 +28,19 @@ public class LoadText2 {
 
 
     private class TextLoader implements Runnable{
-        @Override
-        public void run() {
-            final StringBuilder result = new StringBuilder();
-            BufferedReader reader = null;
-            try {
-                URL url = new URL(urlParam);
-                URLConnection connection = url.openConnection();
-                reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), encoding));
-                String txt;
-                while((txt=reader.readLine())!=null)
-                    result.append(txt+"\n");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
+                    @Override
+                    public void run() {
+                        final StringBuilder result = new StringBuilder();
+                        BufferedReader reader = null;
+                        try {
+                            URL url = new URL(urlParam);
+                            URLConnection connection = url.openConnection();
+                            reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), encoding));
+                            String txt;
+                            while((txt=reader.readLine())!=null)
+                                result.append(txt+"\n");
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

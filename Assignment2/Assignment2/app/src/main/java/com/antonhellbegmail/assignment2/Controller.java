@@ -62,9 +62,6 @@ public class Controller {
 
     public Controller(MainActivity mainActivity){
         this.mainActivity = mainActivity;
-        this.locationListener = new LocList();
-
-        locationManager = (LocationManager) mainActivity.getSystemService(Context.LOCATION_SERVICE);
 
         initDataFragment();
         initComService();
@@ -111,19 +108,20 @@ public class Controller {
 
 
     public void onResume(){
-        if (ContextCompat.checkSelfPermission(mainActivity, android.Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_DENIED &&
-        ContextCompat.checkSelfPermission(mainActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_DENIED &&
-        ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.INTERNET) ==
-                PackageManager.PERMISSION_DENIED){
-            ActivityCompat.requestPermissions(mainActivity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET}, 0);}
-        else {
-            if (timer == null) {
-                timer = new Timer();
-                timer.schedule(new TimerTask(), 0, 30000);
-            }
+        if (timer == null) {
+            timer = new Timer();
+            timer.schedule(new TimerTask(), 0, 30000);
         }
+    }
 
+    public void locationChanged(Location location){
+        if(location != null) {
+            this.currentLong = location.getLongitude();
+            this.currentLat = location.getLatitude();
+            dataFragment.setCurrentLat(currentLat);
+            dataFragment.setCurrentLong(currentLong);
+            Log.d("CONTROLLER", "GOT POSITION" + location.getLatitude() + " " + location.getLongitude());
+        }
     }
 
 
@@ -205,9 +203,11 @@ public class Controller {
 
         bitMapTest = bitmap;
 
-        JSONObject temp = serverCommands.sendImage(dataFragment.getFromIdMap(dataFragment.getActiveChatGroup()),"TEXT",
+        JSONObject temp = serverCommands.sendImage(dataFragment.getFromIdMap(dataFragment.getActiveChatGroup()),chatFragment.getEtMessage(),
                 String.valueOf(dataFragment.getCurrentLong()), String.valueOf(dataFragment.getCurrentLat()));
         commService.send(temp);
+
+        chatFragment.clearMessageField();
 
 
     }
@@ -260,32 +260,6 @@ public class Controller {
         commService.send(refreshObject);
     }
 
-    private class LocList implements android.location.LocationListener{
-
-        @Override
-        public void onLocationChanged(Location location) {
-            currentLat = location.getLatitude();
-            currentLong = location.getLongitude();
-            dataFragment.setCurrentLat(currentLat);
-            dataFragment.setCurrentLong(currentLong);
-            Log.d("POSITION CHANGED", location.getLatitude() + " " + location.getLongitude());
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-
-        }
-    }
 
     public void onDestroy(){
 
@@ -493,6 +467,22 @@ public class Controller {
             groupFragment.updateGroups(dataFragment.getGroupList());
         }
 
+    }
+
+    public double getCurrentLat() {
+        return currentLat;
+    }
+
+    public void setCurrentLat(double currentLat) {
+        this.currentLat = currentLat;
+    }
+
+    public double getCurrentLong() {
+        return currentLong;
+    }
+
+    public void setCurrentLong(double currentLong) {
+        this.currentLong = currentLong;
     }
 
     private class ServiceConnection implements android.content.ServiceConnection{

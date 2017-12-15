@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Assignment2</string>
+    <string name="app_name">Your friends in the world</string>
     <string name="Back">Back</string>
     <string name="Group_members">Group Member:</string>
     <string name="action_settings">Settings</string>

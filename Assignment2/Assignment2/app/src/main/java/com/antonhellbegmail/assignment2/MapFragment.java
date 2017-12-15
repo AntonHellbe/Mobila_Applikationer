@@ -97,13 +97,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         }
 
-        googleMap.setMyLocationEnabled(true);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         this.googleMap = googleMap;
         initPosition();
@@ -132,7 +132,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 continue;
             }
             LatLng pos = new LatLng(parseFloat(m.getLatitude()), parseFloat(m.getLongitude()));
-            MarkerOptions mark = new MarkerOptions().position(pos).title(m.getName());
+            MarkerOptions mark = new MarkerOptions().position(pos).title(m.getName() + " " + m.getLatitude() + " " + m.getLongitude());
             mark.icon(BitmapDescriptorFactory.defaultMarker(markerArray[i % markerArray.length]));
             googleMap.addMarker(mark);
             i++;
@@ -141,7 +141,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         for(TextMessage m: messages){
             if(!(m.getImageId().equals(""))){
                 LatLng pos = new LatLng(parseFloat(m.getLatitude()), parseFloat(m.getLongitude()));
-                MarkerOptions mark = new MarkerOptions().position(pos).title(m.getMember());
+                MarkerOptions mark = new MarkerOptions().position(pos).title(m.getMember() + " " + m.getLatitude() + " " + m.getLongitude());
                 byte[] temp = ((MainActivity)getActivity()).getController().getDataFragment().getFromImageMap(m.getImageId());
                 Bitmap picture = BitmapFactory.decodeByteArray(temp, 0, temp.length);
                 mark.icon(BitmapDescriptorFactory.fromBitmap(picture));
@@ -174,5 +174,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return false;
         }
     }
+
 
 }

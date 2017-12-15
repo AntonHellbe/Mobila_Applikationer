@@ -1,12 +1,18 @@
 package com.antonhellbegmail.assignment2;
 
+import android.*;
+import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Picture;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +28,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
     private final int THUMBNAIL = 1;
     private final int CAMERA_PICTURE = 2;
     private Uri pictureUri;
+    private LocationListener locationListener;
+    private LocationManager locationManager;
+    private Toolbar toolbar;
+
+
 
 
     @Override
@@ -51,6 +63,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        toolbar.setTitle(R.string.app_name);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}, 0); //Ask permission
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 0, locationListener);
+
+        controller.locationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+        controller.locationChanged(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
         controller.onResume();
         super.onResume();
     }
@@ -64,18 +84,20 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        locationManager.removeUpdates(locationListener);
         controller.onPause();
         super.onPause();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        requestPermissions();
         controller = new Controller(this);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        this.locationListener = new LocList();
+        requestPermissions();
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
@@ -239,6 +261,33 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION,
             android.Manifest.permission.INTERNET}, 0);
 
+
+        }
+    }
+
+    private class LocList implements android.location.LocationListener{
+
+        @Override
+        public void onLocationChanged(Location location) {
+            controller.setCurrentLat(location.getLatitude());
+            controller.setCurrentLong(location.getLongitude());
+            controller.getDataFragment().setCurrentLat(location.getLatitude());
+            controller.getDataFragment().setCurrentLong(location.getLongitude());
+            Log.d("POSITION CHANGED", location.getLatitude() + " " + location.getLongitude());
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
 
         }
     }

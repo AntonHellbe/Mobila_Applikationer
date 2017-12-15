@@ -45,7 +45,7 @@ public class Controller {
             index = index % colors.length;
             mainActivity.runOnUiThread(new SetColor(colors[index]));
             try{
-                sleep(50);
+                sleep(SLEEP);
             }catch(InterruptedException e){
 
             }

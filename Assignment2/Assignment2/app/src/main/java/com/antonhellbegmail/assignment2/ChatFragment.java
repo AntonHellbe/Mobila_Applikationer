@@ -117,5 +117,9 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    public String getEtMessage(){
+        return this.etMessage.getText().toString();
+    }
+
 
 }
